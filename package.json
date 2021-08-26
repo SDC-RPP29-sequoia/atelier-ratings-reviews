@@ -2,15 +2,16 @@
   "name": "atelier-ratings-reviews",
   "version": "1.0.0",
   "description": "API service for handling the 'Ratings and Reviews' module of the Atelier shopping app.",
-  "main": "config.js",
   "scripts": {
     "test": "jest --coverage --testResultsProcessor=jest-sonar-reporter",
     "test-init": "jest --init",
     "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
-    "start": "nodemon server.js",
+    "start": "nodemon --ignore node_modules server",
     "mongo-start": "brew services start mongodb-community@4.4",
     "mongo-stop": "brew services stop mongodb-community@4.4",
     "build": "npx babel . --out-dir ./compiled --source-maps inline --ignore=node_modules,compiled --watch",
+    "postgre-start": "brew services start postgresql",
+    "postgre-stop": "brew services stop postgresql",
     "dev": "npm run build & npm run start & npm run test"
   },
   "repository": {
@@ -46,7 +47,9 @@
     "bluebird": "^3.3.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.13.0"
+    "mongoose": "^5.13.0",
+    "pg": "^8.7.1",
+    "sequelize": "^6.6.5"
   },
   "jest": {
     "^config$": "<rootDir>/configs/app-config.js"

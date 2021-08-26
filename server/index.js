@@ -1,8 +1,22 @@
 const app = require('./app.js');
-const db = require('./db/primary');
-const dbSecondary = require('./db/secondary');
-const port = 4568;
+const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Shortly is listening on ${port}`);
+// Primary DB
+const { sequelize, models } = require('./db/primary')
+const seedDataBase = require('./db/primary/seed');
+
+const eraseDatabaseOnSync = false;//true;
+
+// Secondary DB
+const modelsSecondary = require('./db/secondary');
+
+// Initialize server w/ DB
+sequelize.sync({ force: eraseDatabaseOnSync }).then( () => {
+  if (eraseDatabaseOnSync) {
+    seedDatabase(models);
+  }
+
+  app.listen(port, () => {
+    console.log(`NSA is listening in at http://localhost:${port}`);
+  });
 });

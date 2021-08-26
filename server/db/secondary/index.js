@@ -1,4 +1,4 @@
-module.exports.routeData = require('../data/routes.json');
+// module.exports.routeData = require('../models/routes.json');
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/ratings_reviews',
