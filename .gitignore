@@ -102,3 +102,16 @@ dist
 
 # TernJS port file
 .tern-port
+
+build/
+dist/
+compiled
+config.js
+*.DS_Store
+__archive__
+testResults
+sonar-report.xml
+login.sh
+
+*.cer
+*.pem

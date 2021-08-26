@@ -1,0 +1,60 @@
+{
+  "name": "atelier-ratings-reviews",
+  "version": "1.0.0",
+  "description": "API service for handling the 'Ratings and Reviews' module of the Atelier shopping app.",
+  "main": "config.js",
+  "scripts": {
+    "test": "jest --coverage --testResultsProcessor=jest-sonar-reporter",
+    "test-init": "jest --init",
+    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
+    "start": "nodemon server.js",
+    "mongo-start": "brew services start mongodb-community@4.4",
+    "mongo-stop": "brew services stop mongodb-community@4.4",
+    "build": "npx babel . --out-dir ./compiled --source-maps inline --ignore=node_modules,compiled --watch",
+    "dev": "npm run build & npm run start & npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SDC-RPP29-sequoia/atelier-ratings-reviews.git"
+  },
+  "keywords": [
+    "express",
+    "atelier",
+    "hack reactor",
+    "mern",
+    "mysql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SDC-RPP29-sequoia/atelier-ratings-reviews/issues"
+  },
+  "homepage": "https://github.com/SDC-RPP29-sequoia/atelier-ratings-reviews#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.6",
+    "@babel/eslint-parser": "^7.14.7",
+    "@babel/preset-env": "^7.14.7",
+    "babel-jest": "^27.0.6",
+    "coveralls": "^3.1.1",
+    "jest": "^27.0.6",
+    "jest-cli": "^27.0.6",
+    "jest-sonar-reporter": "^2.0.0",
+    "nodemon": "^2.0.12"
+  },
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.0"
+  },
+  "jest": {
+    "^config$": "<rootDir>/configs/app-config.js"
+  },
+  "jestSonar": {
+    "sonar56x": true,
+    "reportPath": "testResults",
+    "reportFile": "sonar-report.xml",
+    "indent": 4
+  }
+}
