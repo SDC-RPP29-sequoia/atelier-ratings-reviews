@@ -33,7 +33,7 @@ router.get('/reviews/',
     // if reported = true, leave out
     // {
     // //   "product": "2",
-    // //   "page": 0,
+    // //   "page": 0, Results are returned by count/page, page increments this
     // //   "count": 5,
 
     //   "results": [
