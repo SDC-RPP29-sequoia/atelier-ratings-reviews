@@ -31,7 +31,7 @@ API service for handling the 'Ratings and Reviews' module of the Atelier shoppin
 # Continuous Integration (IP)
 Basic test of JavaScript continuous integration uses [CircleCI](https://circleci.com/) to run the tests, and [Coveralls](https://coveralls.io/) for reporting test coverage.
 
-Circle CI: [![rpp29-fec-gouda](https://circleci.com/gh/https://app.circleci.com/pipelines/github/SDC-RPP29-sequoia/atelier-ratings-reviews.svg?style=svg)](https://app.circleci.com/pipelines/github/SDC-RPP29-sequoia/atelier-ratings-reviews)
+Circle CI: [![SDC-RPP29-sequoia/atelier-ratings-reviews](https://circleci.com/gh/https://app.circleci.com/pipelines/github/SDC-RPP29-sequoia/atelier-ratings-reviews.svg?style=svg)](https://app.circleci.com/pipelines/github/SDC-RPP29-sequoia/atelier-ratings-reviews)
 
 Coveralls: [![Coverage Status](https://coveralls.io/repos/github/rpp29-fec-gouda/atelier/badge.svg)](https://coveralls.io/github/rpp29-fec-gouda/atelier)
 
