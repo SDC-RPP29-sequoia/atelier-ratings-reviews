@@ -4,6 +4,23 @@ const Promise = require('bluebird');
 // This will control requests between server model and the associated dabatase.
 // This may be turned into a class later with state if that helps with queries.
 
+// ===== Create Methods =====
+const addReview = (review) => {
+  return new Promise( (resolve, reject) => {
+
+    // DB call here
+
+    if (error) {
+      console.log('addReview error:', error);
+      reject(error);
+    } else {
+      resolve();
+    }
+  });
+}
+module.exports.addReview = addReview;
+
+// ===== Read Methods =====
 const getReviewsByProduct = (productId, page, count, sortBy, filter) => {
   return new Promise( (resolve, reject) => {
     let results = [];
@@ -52,6 +69,7 @@ const getReviewMetadata = (reviewId) => {
 }
 module.exports.getReviewMetadata = getReviewMetadata;
 
+// ===== Update Methods =====
 const reportReview = (reviewId) => {
   return new Promise( (resolve, reject) => {
 
@@ -82,17 +100,16 @@ const markReviewHelpful = (reviewId) => {
 }
 module.exports.markReviewHelpful = markReviewHelpful;
 
-const addReview = (review) => {
+const updateMetadata = () => {
   return new Promise( (resolve, reject) => {
 
     // DB call here
 
     if (error) {
-      console.log('addReview error:', error);
+      console.log('updateMetadata error:', error);
       reject(error);
     } else {
       resolve();
     }
   });
 }
-module.exports.addReview = addReview;

@@ -8,6 +8,8 @@ const Promise = require('bluebird');
 //    Falling back to the other database if the first one fails on a query step
 //    Making concurrent calls to the DBs and returning whichever one returns first?
 
+// TODO: Improvement: GetReviewsBatch ? Includes metadata in response
+
 const getReviewsByProduct = (productId, page, count, sortBy, filter) => {
   return new Promise( (resolve, reject) => {
     let results = [];

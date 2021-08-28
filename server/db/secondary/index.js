@@ -1,22 +1,12 @@
 // module.exports.routeData = require('../models/routes.json');
-
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/ratings_reviews',
+const models = require('./models');
+
+const database = 'ratings_reviews';
+mongoose.connect(`mongodb://localhost/${database}`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
   }
 );
-
-// // ===== Schemas/Models =====
-const itemSchema = mongoose.Schema({
-  size: {type: String, required: true},
-});
-const Item = mongoose.model('Item', itemSchema);
-
-// ===== DB Write Methods =====
-const addItems = items => {
-  return Item.insertMany(items);
-};
-module.exports.addItems = addItems;

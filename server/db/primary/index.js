@@ -21,6 +21,7 @@
 // const Promise = require('bluebird');
 // const database = 'ratings_reviews';
 const Sequelize = require('sequelize');
+const models = require('./models');
 const database = 'ratings_reviews';
 const user = 'root';
 const password = '';
