@@ -1,10 +1,38 @@
-// const db = require('../primary');
+// const db = require('../secondary');
 const Promise = require('bluebird');
+
+
+// ==== Import tables ====
+const Characteristic = require('Characteristics.js');
+const Review = require('Reviews.js');
+const ReviewMetadata = require('ReviewMetadata.js');
 
 // This will control requests between server model and the associated dabatase.
 // This may be turned into a class later with state if that helps with queries.
 
 // ===== Create Methods =====
+const eraseDatabaseData = () => {
+  console.log('Erasing Mongo database data');
+  return new Promise ((resolve, reject) => {
+    Promise
+    .all(
+      [
+        Characteristic.deleteMany({}),
+        Review.deleteMany({}),
+        ReviewMetadata.deleteMany({})
+      ])
+    .then((values) => {
+      console.log('Erased all data in Mongo database:', values);
+      resolve();
+    })
+    .catch( error => {
+      console.log('Failed to erase all data in Mongo database');
+      reject(error);
+    });
+  })
+}
+module.exports.eraseDatabaseData = eraseDatabaseData;
+
 const addReview = (review) => {
   return new Promise( (resolve, reject) => {
 
@@ -113,3 +141,9 @@ const updateMetadata = () => {
     }
   });
 }
+
+// ===== Schemas/Models =====
+
+
+
+

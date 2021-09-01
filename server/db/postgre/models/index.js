@@ -1,8 +1,28 @@
-// const db = require('../secondary');
 const Promise = require('bluebird');
 
 // This will control requests between server model and the associated dabatase.
 // This may be turned into a class later with state if that helps with queries.
+
+// ==== Import tables and set up associations ====
+const Review = require ('./Reviews.js');
+const Product = require ('./Products.js');
+Review.hasOne(Product);
+Product.belongsTo(Review);
+
+const Profile = require('./Profiles.js');
+Review.hasOne(Profile);
+Profile.belongsTo(Review);
+
+const Characteristic = require('./Characteristics.js');
+Review.belongsToMany(Characteristic, { through: 'review_to_characteristic' });
+Characteristic.belongsToMany(Review, { through: 'review_to_characteristic' });
+
+const Photo = require('./Photos.js');
+Review.belongsToMany(Photo, { through: 'review_to_photo' });
+Photo.belongsToMany(Review, { through: 'review_to_photo' });
+
+const ReviewMetadata = require('./ReviewMetadata.js');
+
 
 // ===== Create Methods =====
 const addReview = (review) => {
@@ -114,47 +134,4 @@ const updateMetadata = () => {
   });
 }
 
-// ===== Schemas/Models =====
-const ratingsReviewsMetadataSchema = mongoose.Schema({
-  productId: {type: Number, required: true},
-  ratings: {
-    0: {type: Number},
-    1: {type: Number},
-    2: {type: Number},
-    3: {type: Number},
-    4: {type: Number},
-    5: {type: Number},
-  },
-  recommended: {type: Boolean, required: true},
-  characteristics: [
-    {type: characteristicSchema}
-  ]
-});
-const RatingsReviewsMetadata = mongoose.model('RatingsReviewsMetadata', ratingsReviewsMetadataSchema);
 
-const reviewSchema = mongoose.Schema({
-  product_id: {type: Number, required: true},
-  rating: {type: Number, required: true},
-  summary: {type: String, required: true},
-  body: {type: String, required: true},
-  recommend: {type: Boolean, required: true},
-  userName: {type: String, required: true},
-  userEmail: {type: String, required: true},
-  photos: [
-   {
-    id: {type: Number, required: true}, // May not be required. TBD if this is unique globally vs. in a returned batch
-    url: {type: String, required: true}
-   }
-  ],
-  characteristics: [
-    {type: characteristicSchema}
-  ]
-});
-const Review = mongoose.model('Review', reviewSchema);
-
-const characteristicSchema = mongoose.Schema({
-  id: {type: Number, required: true},
-  name: {type: String, required: false},
-  value: {type: String, required: false}
-});
-const Characteristic = mongoose.model('Characteristic', itemSchema);

@@ -1,5 +1,5 @@
-const db = require('../db/primary/models');
-const dbSecondary = require('../db/secondary/models');
+const dbPrimary = require('../db/mongo');
+const dbSecondary = require('../db/postgre');
 const Promise = require('bluebird');
 
 // This will control requests between server and primary/secondary dabatases.
@@ -102,3 +102,11 @@ const addReview = (review) => {
   });
 }
 module.exports.addReview = addReview;
+
+
+const sortEnum = {
+  newest: 'newest',
+  helpful: 'helpful',
+  relevant: 'relevant'
+}
+module.exports.sortEnum = sortEnum;
