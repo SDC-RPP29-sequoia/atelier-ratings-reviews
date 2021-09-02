@@ -1,47 +1,17 @@
-const Promise = require('bluebird');
+const dbPrimary = require('./mongo');
+const dbSecondary = require('./postgre');
+// const Promise = require('bluebird');
 
-// This will control requests between server model and the associated dabatase.
+// This will control requests between server and primary/secondary dabatases.
 // This may be turned into a class later with state if that helps with queries.
+// If data is kept in sync between databases, then this can also be used for:
+//    Falling back to the other database if the first one fails on a query step
+//    Making concurrent calls to the DBs and returning whichever one returns first?
 
-// ==== Import tables and set up associations ====
-const Review = require ('./Reviews.js');
-const Product = require ('./Products.js');
-Review.hasOne(Product);
-Product.belongsTo(Review);
+// TODO: Improvement: GetReviewsBatch ? Includes metadata in response
 
-const Profile = require('./Profiles.js');
-Review.hasOne(Profile);
-Profile.belongsTo(Review);
-
-const Characteristic = require('./Characteristics.js');
-Review.belongsToMany(Characteristic, { through: 'review_to_characteristic' });
-Characteristic.belongsToMany(Review, { through: 'review_to_characteristic' });
-
-const Photo = require('./Photos.js');
-Review.belongsToMany(Photo, { through: 'review_to_photo' });
-Photo.belongsToMany(Review, { through: 'review_to_photo' });
-
-const ReviewMetadata = require('./ReviewMetadata.js');
-
-
-// ===== Create Methods =====
-const addReview = (review) => {
-  return new Promise( (resolve, reject) => {
-
-    // DB call here
-
-    if (error) {
-      console.log('addReview error:', error);
-      reject(error);
-    } else {
-      resolve();
-    }
-  });
-}
-module.exports.addReview = addReview;
-
-// ===== Read Methods =====
 const getReviewsByProduct = (productId, page, count, sortBy, filter) => {
+  // { product_id: productId }
   return new Promise( (resolve, reject) => {
     let results = [];
 
@@ -58,6 +28,7 @@ const getReviewsByProduct = (productId, page, count, sortBy, filter) => {
 module.exports.getReviewsByProduct = getReviewsByProduct;
 
 const getReview = (reviewId) => {
+  // { review_id_external: reviewId }
   return new Promise( (resolve, reject) => {
     let result = {};
 
@@ -74,6 +45,7 @@ const getReview = (reviewId) => {
 module.exports.getReview = getReview;
 
 const getReviewMetadata = (reviewId) => {
+  // { product_id: productId }
   return new Promise( (resolve, reject) => {
     let result = {};
 
@@ -89,8 +61,8 @@ const getReviewMetadata = (reviewId) => {
 }
 module.exports.getReviewMetadata = getReviewMetadata;
 
-// ===== Update Methods =====
 const reportReview = (reviewId) => {
+  // { review_id_external: reviewId }
   return new Promise( (resolve, reject) => {
 
     // DB call here
@@ -106,6 +78,7 @@ const reportReview = (reviewId) => {
 module.exports.reportReview = reportReview;
 
 const markReviewHelpful = (reviewId) => {
+  // { review_id_external: reviewId }
   return new Promise( (resolve, reject) => {
 
     // DB call here
@@ -120,18 +93,25 @@ const markReviewHelpful = (reviewId) => {
 }
 module.exports.markReviewHelpful = markReviewHelpful;
 
-const updateMetadata = () => {
+const addReview = (review) => {
   return new Promise( (resolve, reject) => {
 
     // DB call here
 
     if (error) {
-      console.log('updateMetadata error:', error);
+      console.log('addReview error:', error);
       reject(error);
     } else {
       resolve();
     }
   });
 }
+module.exports.addReview = addReview;
 
 
+const sortEnum = {
+  newest: 'newest',
+  helpful: 'helpful',
+  relevant: 'relevant'
+}
+module.exports.sortEnum = sortEnum;

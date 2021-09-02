@@ -1,13 +1,12 @@
-// module.exports.routeData = require('../models/routes.json');
 const mongoose = require('mongoose');
-const models = require('./models');
+const model = require('./model');
 const seedDatabase = require('./seed.js');
 
 const database = 'ratings_reviews';
 
 const resetMongo = (callback) => {
-  models.eraseDatabaseData()
-  .then (() => seedDatabase(models))
+  model.eraseDatabaseData()
+  .then (() => seedDatabase(model))
   .then (() => callback())
   .catch ( error => console.log('Unable to reset Mongo database', error));
 }
@@ -37,4 +36,4 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
 }
 module.exports.initializeDatabase = initializeDatabase;
 
-module.exports.mongoose = mongoose;
+module.exports.model = model;

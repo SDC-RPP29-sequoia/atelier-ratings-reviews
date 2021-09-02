@@ -1,5 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const models = require('./models');
+const { Sequelize } = require('sequelize');
+const model = require('./model');
 const seedDatabase = require('./seed.js');
 
 const database = 'ratings_reviews';
@@ -40,7 +40,7 @@ const resetDatabase = (callback) => {
   // creates tables if they don't exist, drops them first if force = true
   // Should only be used in dev. For production options, see: https://sequelize.org/master/manual/model-basics.html
   sequelize.sync({ force: true })
-  .then (() => seedDatabase(models))
+  .then (() => seedDatabase(model))
   .then (() => callback())
   .catch ( error => console.log('Unable to reset Postgre database', error));
 }
@@ -64,4 +64,4 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
 };
 module.exports.initializeDatabase = initializeDatabase;
 
-module.exports.sequelize = sequelize;
+module.exports.model = model;
