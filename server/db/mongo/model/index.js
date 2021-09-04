@@ -1,5 +1,6 @@
 // const db = require('../secondary');
 // const Promise = require('bluebird');
+const adaptor = require('./adaptor.js');
 
 
 // ==== Import tables ====
@@ -9,6 +10,7 @@ const ReviewMetadata = require('./ReviewMetadata.js');
 
 // This will control requests between server model and the associated dabatase.
 // This may be turned into a class later with state if that helps with queries.
+
 
 // ===== Create Methods =====
 const addReview = (reviewServer) => {
@@ -46,23 +48,23 @@ const addReview = (reviewServer) => {
 module.exports.addReview = addReview;
 
 // ===== Read Methods =====
-const getReviewsByProduct = (productIdFilter, page, count, sortBy, filter) => {
+const getProductReviews = (productIdFilter, page, count, sortBy, filter) => {
   // TODO: Implement other parameters either here or higher up. See which is better
   return new Promise( (resolve, reject) => {
     Review.find(
       productIdFilter,
-      (error, review) => {
+      (error, reviews) => {
         if (error) {
-          console.log('getReviewsByProduct error:', error);
+          console.log('getProductReviews error:', error);
           reject(error);
         } else {
-          resolve(review);
+          resolve(adaptor.productReviewsToOutput(reviews));
         }
       }
     );
   });
 };
-module.exports.getReviewsByProduct = getReviewsByProduct;
+module.exports.getProductReviews = getProductReviews;
 
 const getReview = (reviewIdFilter) => {
   return new Promise( (resolve, reject) => {
@@ -73,7 +75,7 @@ const getReview = (reviewIdFilter) => {
           console.log('getReview error:', error);
           reject(error);
         } else {
-          resolve(review);
+          resolve(adaptor.reviewToOutput(review));
         }
       }
     );
@@ -90,7 +92,7 @@ const getReviewMetadata = (productIdFilter) => {
           console.log('getReviewMetadata error:', error);
           reject(error);
         } else {
-          resolve(metadata);
+          resolve(adaptor.reviewMetadataToOutput(metadata));
         }
       }
     );
@@ -155,19 +157,16 @@ const updateMetadataForAddedReview = (review) => {
           console.log('updateMetadata finding metadata error:', error);
           reject(error);
         } else {
-          reviewMetadata.count++;
-          reviewMetadata.ratings[review.rating]++;
-          if (review.recommend) {
-            reviewMetadata.recommended++;
-          }
+          incrementRatings(review, reviewMetadata);
+          incrementRecommended(review, reviewMetadata);
 
-          review.characteristics.forEach(characteristic => {
-            if (reviewMetadata.characteristics[characteristic]) {
-              // TODO: See more how these should be stored in metadata
-              // id, name, value
-            } else {
-              reviewMetadata.characteristics.push(characteristic);
-            }
+          // TODO: This is dirty/dumb. Fix later!
+          review.characteristics?.forEach(characteristic => {
+            reviewMetadata.characteristics?.forEach(characteristicMetadata => {
+              if (characteristic.id === characteristicMetadata.id) {
+                incrementRatings(characteristic, characteristicMetadata);
+              }
+            })
           });
 
           reviewMetadata.save(error => {
@@ -194,15 +193,16 @@ const updateMetadataForRemovedReview = (review) => {
           console.log('updateMetadata finding metadata error:', error);
           reject(error);
         } else {
-          reviewMetadata.count--;
-          reviewMetadata.ratings[review.rating]--;
-          if (review.recommend) {
-            reviewMetadata.recommended--;
-          }
+          decrementRatings(review, reviewMetadata);
+          decrementRecommended(review, reviewMetadata);
 
-          review.characteristics.forEach(characteristic => {
-            // TODO: See more how these should be stored in metadata
-              // id, name, value
+          // TODO: This is dirty/dumb. Fix later!
+          review.characteristics?.forEach(characteristic => {
+            reviewMetadata.characteristics?.forEach(characteristicMetadata => {
+              if (characteristic.id === characteristicMetadata.id) {
+                decrementRatings(characteristic, characteristicMetadata);
+              }
+            })
           });
 
           reviewMetadata.save(error => {
@@ -218,6 +218,40 @@ const updateMetadataForRemovedReview = (review) => {
       }
     );
   });
+}
+
+// TODO: These may be contenders for schema METHODS
+const incrementRatings = (newRating, ratingLog) => {
+  ratingLog.ratings[newRating.rating]++;
+  return ratingLog;
+};
+
+// TODO: These may be contenders for schema METHODS
+const decrementRatings = (newRating, ratingLog) => {
+  ratingLog.ratings[newRating.rating]--;
+  return ratingLog;
+};
+
+// TODO: These may be contenders for schemas & schema METHODS?
+const incrementRecommended = (review, reviewMetadata) => {
+  if (review.recommend !== undefined) {
+    if (review.recommend) {
+      reviewMetadata.recommended.true++;
+    } else {
+      reviewMetadata.recommended.false++;
+    }
+  }
+}
+
+// TODO: These may be contenders for schemas & schema METHODS?
+const decrementRecommended = (review, reviewMetadata) => {
+  if (review.recommend !== undefined) {
+    if (review.recommend) {
+      reviewMetadata.recommended.true--;
+    } else {
+      reviewMetadata.recommended.false--;
+    }
+  }
 }
 
 // ===== Delete Methods =====

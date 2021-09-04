@@ -1,7 +1,10 @@
+const ratingSchema = require('./Ratings.js');
+
 const characteristicSchema = mongoose.Schema({
-  id: {type: Number, required: true},
-  name: {type: String, required: false},
-  value: {type: String, required: false}
+  id: { type: Number, required: true },
+  name: { type: String, required: true },
+  rating: { type: Number },
+  ratings: { type: ratingSchema }
 });
 module.exports.characteristicSchema = characteristicSchema;
 

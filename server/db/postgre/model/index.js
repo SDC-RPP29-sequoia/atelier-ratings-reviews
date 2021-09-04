@@ -1,4 +1,5 @@
 // const Promise = require('bluebird');
+const adaptor = require('./adaptor.js');
 
 // This will control requests between server model and the associated dabatase.
 // This may be turned into a class later with state if that helps with queries.
@@ -14,9 +15,8 @@ Review.hasOne(Profile);
 Profile.belongsTo(Review);
 
 const Characteristic = require('./Characteristics.js');
-const CharacteristicName = require('./CharacteristicNames.js');
-Characteristic.hasOne(CharacteristicName);
-CharacteristicName.belongsTo(Characteristic);
+Characteristic.hasOne(Rating);
+Rating.belongsTo(Characteristic);
 
 Review.belongsToMany(Characteristic, { through: 'review_to_characteristic' });
 Characteristic.belongsToMany(Review, { through: 'review_to_characteristic' });
@@ -26,10 +26,16 @@ Review.belongsToMany(Photo, { through: 'review_to_photo' });
 Photo.belongsToMany(Review, { through: 'review_to_photo' });
 
 const ReviewMetadata = require('./ReviewMetadata.js');
-const ReviewMetadataRating = require('./ReviewMetadataRatings.js');
-ReviewMetadata.hasOne(ReviewMetadataRating);
-ReviewMetadataRating.belongsTo(ReviewMetadata);
-// TODO: Handle associated characteristics here as well
+Characteristic.hasOne(ReviewMetadata);
+ReviewMetadata.belongsTo(Characteristic);
+
+const Rating = require('./Ratings.js');
+ReviewMetadata.hasOne(Rating);
+Rating.belongsTo(ReviewMetadata);
+
+const Recommended = require('./Recommended.js');
+ReviewMetadata.hasOne(Recommended);
+Recommended.belongsTo(ReviewMetadata);
 
 
 // ===== Create Methods =====
@@ -68,24 +74,24 @@ const addReview = (reviewServer) => {
 module.exports.addReview = addReview;
 
 // ===== Read Methods =====
-const getReviewsByProduct = (productIdFilter, page, count, sortBy, filter) => {
+const getProductReviews = (productIdFilter, page, count, sortBy, filter) => {
   // TODO: Implement other parameters either here or higher up. See which is better
   return new Promise( (resolve, reject) => {
     Review.findAll({ where: productIdFilter })
-    .then( review => {
-      if (review === null) {
+    .then( reviews => {
+      if (reviews === null || reviews.length === 0) {
         console.log('No reviews found!', productIdFilter);
       } else {
-        resolve(review);
+        resolve(adaptor.productReviewsToOutput(reviews));
       }
     })
     .catch( error => {
-      console.log('getReviewsByProduct error:', error);
+      console.log('getProductReviews error:', error);
       reject(error);
     });
   });
 };
-module.exports.getReviewsByProduct = getReviewsByProduct;
+module.exports.getProductReviews = getProductReviews;
 
 const getReview = (reviewIdFilter) => {
   return new Promise( (resolve, reject) => {
@@ -94,7 +100,7 @@ const getReview = (reviewIdFilter) => {
       if (review === null) {
         console.log('Review not found!', reviewFilter);
       } else {
-        resolve(review);
+        resolve(adaptor.reviewToOutput(review));
       }
     })
     .catch( error => {
@@ -112,7 +118,7 @@ const getReviewMetadata = (productIdFilter) => {
       if (metadata === null) {
         console.log('ReviewMetadata not found!', productIdFilter);
       } else {
-        resolve(metadata);
+        resolve(adaptor.reviewMetadataToOutput(metadata));
       }
     })
     .catch( error => {
@@ -167,92 +173,198 @@ module.exports.markReviewHelpful = markReviewHelpful;
 
 const updateMetadataForAddedReview = (review) => {
   return new Promise( (resolve, reject) => {
-    ReviewMetadata.increment(
-      ['count', 'recommended'],
-      { where: { product_id: review.product_id } }
-    )
-    .then(affectedRows => {
-      if (affectedRows.length === 0) {
-        console.log('Review metadata failed to be incremented');
-        reject();
-      } else {
-        ReviewMetadataRating.increment(
-          `star_${review.rating}`,
-          { where: { id: affectedRows[0].id } })
-        .then(rowsAffected => {
-          if (rowsAffected.length === 0) {
-            console.log('Review metadata rating failed to be incremented');
-            reject();
-          } else {
-            resolve();
-          }
-        })
-        .catch(error => {
-          console.log('updateMetadata incrementing rating error:', error);
-          reject(error);
-        });
-      }
+    Promise.all([
+      incrementRecommended(review.recommended, fk1), // Needs to be the foreign key
+      incrementRatings(review.rating, fk2), // Needs to be the foreign key
+      updateCharacteristicsRating(review.characteristics)
+    ])
+    .then(values => {
+      console.log(values);
+      resolve();
     })
     .catch(error => {
       console.log('updateMetadata incrementing error:', error);
       reject(error);
     });
-
-    // TODO: Work out characteristics
-    // review.characteristics.forEach(characteristic => {
-    //   if (reviewMetadata.characteristics[characteristic]) {
-    //     // TODO: See more how these should be stored in metadata
-    //     // id, name, value
-    //   } else {
-    //     reviewMetadata.characteristics.push(characteristic);
-    //   }
-    // });
   });
 };
 
 const updateMetadataForRemovedReview = (review) => {
   return new Promise( (resolve, reject) => {
-    ReviewMetadata.decrement(
-      ['count', 'recommended'],
-      { where: { product_id: review.product_id } }
-    )
-    .then(affectedRows => {
-      if (affectedRows.length === 0) {
-        console.log('Review metadata failed to be decremented');
-        reject();
-      } else {
-        ReviewMetadataRating.decrement(
-          `star_${review.rating}`,
-          { where: { id: affectedRows[0].id } })
-        .then(rowsAffected => {
-          if (rowsAffected.length === 0) {
-            console.log('Review metadata rating failed to be decremented');
-            reject();
-          } else {
-            resolve();
-          }
-        })
-        .catch(error => {
-          console.log('updateMetadata decrementing rating error:', error);
-          reject(error);
-        });
-      }
+    Promise.all([
+      decrementRecommended(review.recommended, fk1), // Needs to be the foreign key
+      decrementRatings(review.rating, fk2), // Needs to be the foreign key
+      updateCharacteristicsRating(review.characteristics, false)
+    ])
+    .then(values => {
+      console.log(values);
+      resolve();
     })
     .catch(error => {
       console.log('updateMetadata decrementing error:', error);
       reject(error);
     });
-
-    // TODO: Work out characteristics
-    // review.characteristics.forEach(characteristic => {
-    //   if (reviewMetadata.characteristics[characteristic]) {
-    //     // TODO: See more how these should be stored in metadata
-    //     // id, name, value
-    //   } else {
-    //     reviewMetadata.characteristics.push(characteristic);
-    //   }
-    // });
   });
-}
+};
+
+const incrementRatings = (rating, ratingId) => {
+  return new Promise((resolve, reject) => {
+    Ratings.increment(
+      `star_${rating}`,
+      { where: { id: ratingId } })
+    .then(affectedRows => {
+      if (affectedRows.length === 0) {
+        console.log('Review metadata rating failed to be incremented');
+        reject();
+      } else {
+        resolve();
+      }
+    })
+    .catch(error => {
+      console.log('updateMetadata incrementing rating error:', error);
+      reject(error);
+    });
+ });
+};
+
+const decrementRatings = (rating, ratingId) => {
+  return new Promise((resolve, reject) => {
+    Ratings.decrement(
+      `star_${rating}`,
+      { where: { id: ratingId } })
+    .then(affectedRows => {
+      if (affectedRows.length === 0) {
+        console.log('Review metadata rating failed to be decremented');
+        reject();
+      } else {
+        resolve();
+      }
+    })
+    .catch(error => {
+      console.log('updateMetadata decrementing rating error:', error);
+      reject(error);
+    });
+  });
+};
+
+const incrementRecommended = (recommended, recommendedId) => {
+  return new Promise((resolve, reject) => {
+    if (recommended !== undefined) {
+      const recommendedProperty = recommended ? 'true' : 'false';
+
+      Recommended.increment(
+        recommendedProperty,
+        { where: { id: recommendedId } })
+      .then(affectedRows => {
+        if (affectedRows.length === 0) {
+          console.log('Review metadata recommendations failed to be incremented');
+          reject();
+        } else {
+          resolve();
+        }
+      })
+      .catch(error => {
+        console.log('updateMetadata incrementing recommendations error:', error);
+        reject(error);
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
+const decrementRecommended = (recommended, recommendedId) => {
+  return new Promise((resolve, reject) => {
+    if (recommended !== undefined) {
+      const recommendedProperty = recommended ? 'true' : 'false';
+
+      Recommended.decrement(
+        recommendedProperty,
+        { where: { id: recommendedId } })
+      .then(affectedRows => {
+        if (affectedRows.length === 0) {
+          console.log('Review metadata recommendations failed to be decremented');
+          reject();
+        } else {
+          resolve();
+        }
+      })
+      .catch(error => {
+        console.log('updateMetadata decrementing recommendations error:', error);
+        reject(error);
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
+const updateCharacteristicsRating = (characteristics, increment = true) => {
+  const updates = [];
+  for (let i = 0; i < characteristics.length; i++) {
+    const characteristic = characteristics[i];
+    let callback = null;
+    if (increment) {
+      callback = incrementCharacteristic.bind(null, characteristic);
+    } else {
+      callback = decrementCharacteristic.bind(null, characteristic);
+    }
+    updates.push(callback);
+  }
+
+  return new Promise( (resolve, reject) => {
+    Promise.all([ updates ])
+    .then(values => {
+      console.log(values);
+      resolve();
+    })
+    .catch(error => {
+      console.log('Characteristic group incrementing error:', error);
+      reject(error);
+    });
+  });
+};
+
+const incrementCharacteristic = (characteristic) => {
+  // TODO: Actually needs to increment rating by id
+  return new Promise((resolve, reject) => {
+    Characteristic.increment(
+      'rating',
+      { where: { characteristic_id_external: characteristic.id } })
+    .then(affectedRows => {
+      if (affectedRows.length === 0) {
+        console.log('Characteristic failed to be incremented');
+        reject();
+      } else {
+        resolve();
+      }
+    })
+    .catch(error => {
+      console.log('Characteristic incrementing error:', error);
+      reject(error);
+    });
+ });
+};
+
+const decrementCharacteristic = (characteristic) => {
+  // TODO: Actually needs to increment rating by id
+  return new Promise((resolve, reject) => {
+    Characteristic.decrement(
+      'rating',
+      { where: { characteristic_id_external: characteristic.id } })
+    .then(affectedRows => {
+      if (affectedRows.length === 0) {
+        console.log('Characteristic failed to be decremented');
+        reject();
+      } else {
+        resolve();
+      }
+    })
+    .catch(error => {
+      console.log('Characteristic decrementing error:', error);
+      reject(error);
+    });
+ });
+};
 
 // ===== Delete Methods =====

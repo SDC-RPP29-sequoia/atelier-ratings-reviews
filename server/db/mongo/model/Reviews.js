@@ -1,7 +1,8 @@
 const characteristicSchema = require('./Characteristics.js');
+const photoSchema = require('./Photos.js');
 
 const reviewSchema = mongoose.Schema({
-  review_id_external: { type: Number, required: true },
+  review_id: { type: Number, required: true },
   product_id: { type: Number, required: true },
   rating: { type: Number, required: true },
   summary: { type: String, required: true },
@@ -12,10 +13,7 @@ const reviewSchema = mongoose.Schema({
   userName: { type: String, required: true },
   userEmail: { type: String, required: true },
   photos: [
-   {
-    id: { type: Number, required: true }, // May not be required. TBD if this is unique globally vs. in a returned batch
-    url: { type: String, required: true }
-   }
+   { type: photoSchema }
   ],
   characteristics: [
     { type: characteristicSchema }

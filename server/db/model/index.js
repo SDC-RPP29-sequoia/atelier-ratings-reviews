@@ -1,5 +1,6 @@
-const dbPrimary = require('./mongo');
-const dbSecondary = require('./postgre');
+const adaptor = require('./adaptor.js');
+const dbPrimary = require('../mongo');
+const dbSecondary = require('../postgre');
 // const Promise = require('bluebird');
 
 // This will control requests between server and primary/secondary dabatases.
@@ -10,22 +11,29 @@ const dbSecondary = require('./postgre');
 
 // TODO: Improvement: GetReviewsBatch ? Includes metadata in response
 
-const getReviewsByProduct = (productId, page, count, sortBy, filter) => {
+// ===== FOR ALL METHODS =====
+// 1. Receives input contract object needed for db controller based on URL params/query. Other data left raw.
+// 2. Completes forming contract object for sending to either DB
+// 3. Makes DB request to the appropriate database
+// 4. Receives DB request in output contract object and sends it back
+
+const getProductReviews = (productId, page, count, sortBy) => {
   // { product_id: productId }
   return new Promise( (resolve, reject) => {
+    const productReviewRequest = adaptor.productReviewsRequestFromServerToDatabase(productId, page, count, sortBy);
     let results = [];
 
     // DB call here
 
     if (error) {
-      console.log('getReviewsByProduct error:', error);
+      console.log('getProductReviews error:', error);
       reject(error);
     } else {
       resolve(results);
     }
   });
 }
-module.exports.getReviewsByProduct = getReviewsByProduct;
+module.exports.getProductReviews = getProductReviews;
 
 const getReview = (reviewId) => {
   // { review_id_external: reviewId }
@@ -93,9 +101,9 @@ const markReviewHelpful = (reviewId) => {
 }
 module.exports.markReviewHelpful = markReviewHelpful;
 
-const addReview = (review) => {
+const addReview = (reviewServer) => {
   return new Promise( (resolve, reject) => {
-
+    const review = adaptor.reviewFromServerToDatabase(reviewServer);
     // DB call here
 
     if (error) {
@@ -108,10 +116,3 @@ const addReview = (review) => {
 }
 module.exports.addReview = addReview;
 
-
-const sortEnum = {
-  newest: 'newest',
-  helpful: 'helpful',
-  relevant: 'relevant'
-}
-module.exports.sortEnum = sortEnum;

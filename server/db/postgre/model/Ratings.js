@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 
-const ReviewMetadataRating = sequelize.define('ReviewMetadataRating', {
+const Rating = sequelize.define('Rating', {
   star_0: {
     type: DataTypes.INTEGER
   },
@@ -20,6 +20,6 @@ const ReviewMetadataRating = sequelize.define('ReviewMetadataRating', {
     type: DataTypes.INTEGER
   },
 }, {
-  tableName: 'review_meta_data_rating'
+  tableName: 'rating'
 });
-module.exports.ReviewMetadataRating = ReviewMetadataRating;
+module.exports.Rating = Rating;
