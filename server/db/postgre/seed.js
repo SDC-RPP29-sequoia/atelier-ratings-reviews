@@ -1,6 +1,7 @@
 // const Promise = require('bluebird');
 
 const seedDatabase = (models) => {
+  console.log('Seeding Postgre database');
   // if (!db.queryAsync) {
   //   db = Promise.promisifyAll(db);
   // }
@@ -44,6 +45,7 @@ const seedDatabase = (models) => {
   //   .error(err => {
   //     console.log(err);
   //   });
+  console.log('Postgre database successfully seeded');
 };
 
 module.exports = seedDatabase;
