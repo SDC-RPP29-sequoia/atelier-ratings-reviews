@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 const model = require('./models');
-const seedDatabase = require('./seed.js');
+// const seedDatabase = require('./seeders/index.js');
 
 const database = 'ratings_reviews';
 const user = 'root';
@@ -40,7 +40,7 @@ const resetDatabase = (callback) => {
   // creates tables if they don't exist, drops them first if force = true
   // Should only be used in dev. For production options, see: https://sequelize.org/master/manual/model-basics.html
   sequelize.sync({ force: true })
-  .then (() => seedDatabase(model))
+  // .then (() => seedDatabase(model))
   .then (() => callback())
   .catch ( error => console.log('Unable to reset Postgre database', error));
 }
@@ -51,7 +51,7 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
   .then ( () => {
     console.log('Connection to Postgre has been established successfully.');
     if (eraseDatabaseOnSync) {
-      resetDatabase(callback);
+      // resetDatabase(callback);
     }
     else {
       sequelize.sync()
