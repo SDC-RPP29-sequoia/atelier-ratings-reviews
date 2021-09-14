@@ -1,5 +1,3 @@
-// const Promise = require('bluebird');
-
 const seedDatabase = (models) => {
   console.log('Seeding Postgre database');
   // TODO: Complete or remove. Currently seeding is done on the CLI and may be best called in a bash script, or loaded from here.

@@ -29,27 +29,27 @@ const connectDatabase = () => {
       );
       resolve(sequelize);
     } catch (error) {
-      console.error('Unable to connect to the postgre database:', error);
+      console.error('Unable to connect to the Postgres database:', error);
       reject(error);
     }
   });
 };
 
 const resetDatabase = (callback) => {
-  console.log('Erasing Postgre database data');
+  console.log('Erasing Postgres database data');
   // creates tables if they don't exist, drops them first if force = true
   // Should only be used in dev. For production options, see: https://sequelize.org/master/manual/model-basics.html
   sequelize.sync({ force: true })
   // .then (() => seedDatabase(model))
   .then (() => callback())
-  .catch ( error => console.log('Unable to reset Postgre database', error));
+  .catch ( error => console.log('Unable to reset Postgres database', error));
 }
 
 const initializeDatabase = (eraseDatabaseOnSync, callback) => {
   connectDatabase()
   .then( () => sequelize.authenticate() )
   .then ( () => {
-    console.log('Connection to Postgre has been established successfully.');
+    console.log('Connection to Postgres has been established successfully.');
     if (eraseDatabaseOnSync) {
       // resetDatabase(callback);
     }
@@ -59,7 +59,7 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
     }
   })
   .catch(error => {
-    console.error('Unable to initialize the Postgre database:', error);
+    console.error('Unable to initialize the Postgres database:', error);
   });
 };
 module.exports.initializeDatabase = initializeDatabase;
