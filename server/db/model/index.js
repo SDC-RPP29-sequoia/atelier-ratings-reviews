@@ -1,7 +1,6 @@
 const adaptor = require('./adaptor.js');
 const dbPrimary = require('../mongo');
 const dbSecondary = require('../postgre');
-// const Promise = require('bluebird');
 
 // This will control requests between server and primary/secondary dabatases.
 // This may be turned into a class later with state if that helps with queries.
@@ -36,7 +35,7 @@ const getProductReviews = (productId, page, count, sortBy) => {
 module.exports.getProductReviews = getProductReviews;
 
 const getReview = (reviewId) => {
-  // { review_id_external: reviewId }
+  // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
     let result = {};
 
@@ -70,7 +69,7 @@ const getReviewMetadata = (reviewId) => {
 module.exports.getReviewMetadata = getReviewMetadata;
 
 const reportReview = (reviewId) => {
-  // { review_id_external: reviewId }
+  // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
 
     // DB call here
@@ -86,7 +85,7 @@ const reportReview = (reviewId) => {
 module.exports.reportReview = reportReview;
 
 const markReviewHelpful = (reviewId) => {
-  // { review_id_external: reviewId }
+  // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
 
     // DB call here

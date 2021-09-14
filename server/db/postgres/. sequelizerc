@@ -1,0 +1,9 @@
+const path = require('path');
+const root = path.resolve('./server/db/postgres');
+
+module.exports = {
+  config: path.resolve('./server/db/postgres/config', 'config.js'),
+  'models-path': path.resolve('./server/db/postgres/models'),
+  'seeders-path': path.resolve('./server/db/postgres/seeders'),
+  'migrations-path': path.resolve('./server/db/postgres/migrations'),
+}

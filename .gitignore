@@ -106,12 +106,19 @@ dist
 build/
 dist/
 compiled
-config.js
+#config
+#config.js
+.env
 *.DS_Store
 __archive__
+__notes__
 testResults
 sonar-report.xml
 login.sh
 
 *.cer
 *.pem
+
+data
+parseCsvToJson.sh
+installation

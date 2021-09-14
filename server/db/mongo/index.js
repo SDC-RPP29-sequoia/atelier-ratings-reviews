@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const model = require('./model');
+const model = require('./models');
 const seedDatabase = require('./seed.js');
 
 const database = 'ratings_reviews';
