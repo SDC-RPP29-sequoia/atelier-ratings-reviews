@@ -4,7 +4,7 @@ const controllers = require('../controllers');
 const reviewsData = require('./ReviewsData.js');
 const reviewsMetadataData = require('./ReviewsMetadata.js');
 
-const reSeedDatabase = (database) => {
+const reSeedDatabase = (database, isProcess=true) => {
   return new Promise((resolve, reject) => {
     mongoose.connect(`mongodb://localhost/${database}`,
       {
@@ -20,10 +20,21 @@ const reSeedDatabase = (database) => {
       console.log('Connection to Mongo has been established successfully.');
       controllers.eraseDatabaseData()
       .then (() => seedDatabase(models))
-      .then (() => resolve())
+      .then (() => {
+        console.log('Reseeding of Mongo database complete');
+        if (isProcess) {
+          process.exit();
+        } else {
+          resolve();
+        }
+      })
       .catch ( error => {
         console.log('Unable to reset Mongo database', error);
-        reject();
+        if (isProcess) {
+          process.exit();
+        } else {
+          reject();
+        }
       });
     })
     .catch ( error => {
