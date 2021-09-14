@@ -65,6 +65,7 @@ const seedDatabase = (models) => {
 const database = 'ratings_reviews_dev';
 reSeedDatabase(database);
 
+// See: https://javascript.plainenglish.io/seed-your-bulk-data-to-mongodb-in-node-js-57e9046e923d
 // // Load env vars
 // dotenv.config({ path: "./config/config.env" });
 

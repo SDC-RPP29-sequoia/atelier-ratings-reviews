@@ -12,8 +12,8 @@ mongo.initializeDatabase(eraseDatabaseOnSync,
 );
 
 // Secondary DB
-const Postgres = require('./db/postgre')
-postgre.initializeDatabase(eraseDatabaseOnSync,
+const postgres = require('./db/postgre')
+postgres.initializeDatabase(eraseDatabaseOnSync,
   app.listen(port, () => {
     console.log(`NSA is listening in at http://localhost:${port}`);
   })
