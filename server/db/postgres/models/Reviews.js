@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     recommend: DataTypes.BOOLEAN, // allowNull: false
     body: DataTypes.TEXT, // allowNull: false
     response: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
+    date: DataTypes.DATE,
     helpfulness: DataTypes.INTEGER,
     reported: DataTypes.BOOLEAN,
   }, {
@@ -24,14 +24,20 @@ module.exports = (sequelize, DataTypes) => {
       as: 'user'
     });
 
-    Review.belongsToMany(models.Characteristic, { through: models.ReviewToCharacteristic });
+    Review.belongsToMany(models.Characteristic, {
+      through: models.ReviewToCharacteristic,
+      foreignKey: 'review_id'
+    });
     Review.hasMany(models.ReviewToCharacteristic, {
       foreignKey: 'review_id',
       as: 'characteristics',
       onDelete: 'CASCADE',
     });
 
-    Review.belongsToMany(models.Photo, { through: models.ReviewToPhoto });
+    Review.belongsToMany(models.Photo, {
+        through: models.ReviewToPhoto,
+        foreignKey: 'review_id'
+    });
     Review.hasMany(models.ReviewToPhoto, {
       foreignKey: 'review_id',
       as: 'photos',

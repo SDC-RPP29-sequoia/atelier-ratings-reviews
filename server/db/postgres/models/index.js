@@ -13,8 +13,10 @@ const db = {};
 let sequelize;
 if (config.url) {
   sequelize = new Sequelize(config.url, config);
+  console.log(`Loading models for ${config.url}`);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
+  console.log(`Loading models for ${config.database}`);
 }
 
 // Adds each model file to this module, injects sequelize dependencies

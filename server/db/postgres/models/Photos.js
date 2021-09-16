@@ -6,7 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'photo'
   });
   Photo.associate = function(models) {
-    Photo.belongsToMany(models.Review, { through: models.ReviewToPhoto });
+    Photo.belongsToMany(models.Review, {
+      through: models.ReviewToPhoto,
+      foreignKey: 'photo_id'
+    });
     Photo.hasMany(models.ReviewToPhoto, {
       foreignKey: 'photo_id',
       as: 'reviews',

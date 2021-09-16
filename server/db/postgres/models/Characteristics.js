@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'rating'
     });
 
-    Characteristic.belongsToMany(models.Review, { through: models.ReviewToCharacteristic });
+    Characteristic.belongsToMany(models.Review, {
+      through: models.ReviewToCharacteristic,
+      foreignKey: 'characteristic_id'
+    });
     Characteristic.hasMany(models.ReviewToCharacteristic, {
       foreignKey: 'characteristic_id',
       as: 'reviews',

@@ -11,7 +11,8 @@ module.exports = {
       },
       characteristic_id: {
         allowNull: false,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        unique: true
       },
       name: {
         allowNull: false,
@@ -24,6 +25,14 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
     });
   },
 

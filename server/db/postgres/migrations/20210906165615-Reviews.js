@@ -11,7 +11,8 @@ module.exports = {
       },
       review_id: {
         allowNull: false,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        unique: true
       },
       rating: {
         allowNull: false,
@@ -46,6 +47,10 @@ module.exports = {
       profile_id: {
         allowNull: false,
         type: Sequelize.INTEGER
+      },
+      date: {
+        allowNull: false,
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

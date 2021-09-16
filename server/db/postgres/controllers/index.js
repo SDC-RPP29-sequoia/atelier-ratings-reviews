@@ -1,12 +1,18 @@
 const adaptor = require('./adaptor.js');
-const models = require("../models");
+const db = require("../models");
 
 const {
   Characteristic,
   Review,
   ReviewMetadata,
   Ratings,
-  Recommended } = models;
+  Recommended } = db;
+
+  const Review = db.Review;
+  const ReviewMetadata = db.ReviewMetadata;
+  const Characteristic = db.Characteristic;
+  const Ratings = db.Ratings;
+  const Recommended = db.Recommended;
 
 // ===== Create Methods =====
 const addReview = (reviewServer) => {
