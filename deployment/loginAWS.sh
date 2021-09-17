@@ -1,0 +1,1 @@
+ssh -i "atelier.cer" ubuntu@ec2-3-15-187-26.us-east-2.compute.amazonaws.com

@@ -1,6 +1,6 @@
 class ReviewMetaData {
-  constructor() {
-    this.product_id = null;
+  constructor(product_id) {
+    this.product_id = product_id;
     this.ratings = {};
     this.recommended = {};
     this.characteristics = {};

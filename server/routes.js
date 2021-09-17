@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const dbModel = require('./db/model');
-// const models = require('./models');
-// const Auth = require('./middleware/auth');
+
+const db = dbModel.methods;
 
 // Authentication
 // To use this API, you must create a GitHub API Token and attach it in every request as an "Authorization" header.
@@ -24,7 +24,7 @@ router.get('/reviews/',
     if (!productId) {
       res.status('400').send('Product ID missing.');
     } else {
-      dbModel.getProductReviews(productId, page, count, sort)
+      db.getProductReviews(productId, page, count, sort)
       .then(results => {
         const productReviews = {
           product: productId,
@@ -50,7 +50,7 @@ router.get('/reviews/meta',
     if (!reviewId) {
       res.status('400').send('Review ID missing.');
     } else {
-      dbModel.getReviewMetadata(reviewId)
+      db.getReviewMetadata(reviewId)
       .then(result => res.status('200').send(result))
       .catch(error => {
         console.log('Server error', error);
@@ -76,7 +76,7 @@ router.post('/reviews',
       res.status('400').send('Reviewer rating or recommendation is missing. At least one is needed.');
     }
 
-    dbModel.addReview(review)
+    db.addReview(review)
     .then(() => res.status('201').send())
     .catch(error => {
       console.log('Server error', error);
@@ -92,7 +92,7 @@ router.put('/reviews/:review_id/helpful',
     if (!reviewId) {
       res.status('400').send('Review ID missing.');
     } else {
-      dbModel.markReviewHelpful(reviewId)
+      db.markReviewHelpful(reviewId)
       .then(() => res.status('204').send())
       .catch(error => {
         console.log('Server error', error);
@@ -110,7 +110,7 @@ router.get('/reviews/:review_id/report',
     if (!reviewId) {
       res.status('400').send('Review ID missing.');
     } else {
-      dbModel.reportReview(reviewId)
+      db.reportReview(reviewId)
       .then(() => res.status('204').send())
       .catch(error => {
         console.log('Server error', error);

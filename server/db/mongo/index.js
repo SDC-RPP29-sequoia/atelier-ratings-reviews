@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
-const model = require('./model');
-const seedDatabase = require('./seed.js');
+const controller = require('./controllers');
 
 const database = 'ratings_reviews';
 
-const resetMongo = (callback) => {
-  model.eraseDatabaseData()
-  .then (() => seedDatabase(model))
-  .then (() => callback())
-  .catch ( error => console.log('Unable to reset Mongo database', error));
-}
+// const resetMongo = (callback) => {
+//   model.eraseDatabaseData()
+//   .then (() => seedDatabase(model))
+//   .then (() => callback())
+//   .catch ( error => console.log('Unable to reset Mongo database', error));
+// }
 
 const initializeDatabase = (eraseDatabaseOnSync, callback) => {
   mongoose.connect(`mongodb://localhost/${database}`,
@@ -25,7 +24,7 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
   .then ( () => {
     console.log('Connection to Mongo has been established successfully.');
     if (eraseDatabaseOnSync) {
-      resetMongo(callback);
+      // resetMongo(callback);
     } else {
       callback();
     }
@@ -34,6 +33,8 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
     console.error('Unable to initialize the Mongo database:', error)
   )
 }
-module.exports.initializeDatabase = initializeDatabase;
 
-module.exports.model = model;
+module.exports.mongo = {
+  initializeDatabase: initializeDatabase,
+  methods: controller
+};

@@ -9,7 +9,7 @@ const reviewFromServerToDatabase = (reviewServer) => {
 }
 module.exports.reviewFromServerToDatabase = reviewFromServerToDatabase;
 
-const productReviewsRequestFromServerToDatabase = (productReviewsRequest) => {
-  return new ProductReviewsRequest(productReviewsRequest);
+const productReviewsRequestFromServerToDatabase = (productId, page, count, sortBy) => {
+  return new ProductReviewsRequest(productId, page, count, sortBy);
 }
 module.exports.productReviewsRequestFromServerToDatabase = productReviewsRequestFromServerToDatabase;

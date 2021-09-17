@@ -1,7 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-// const Auth = require('./middleware/auth');
-// const models = require('./models');
 const routes = require('./routes');
 
 const app = express();
