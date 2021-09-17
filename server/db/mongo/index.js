@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const model = require('./models');
+const controller = require('./controllers');
 
 const database = 'ratings_reviews';
 
@@ -33,6 +33,8 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
     console.error('Unable to initialize the Mongo database:', error)
   )
 }
-module.exports.initializeDatabase = initializeDatabase;
 
-module.exports.model = model;
+module.exports.mongo = {
+  initializeDatabase: initializeDatabase,
+  methods: controller
+};

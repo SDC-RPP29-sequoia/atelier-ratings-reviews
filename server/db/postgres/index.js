@@ -1,5 +1,4 @@
 const { Sequelize } = require('sequelize');
-const model = require('./models');
 const controller = require('./controllers');
 // const seedDatabase = require('./seeders/index.js');
 
@@ -63,7 +62,8 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
     console.error('Unable to initialize the Postgres database:', error);
   });
 };
-module.exports.initializeDatabase = initializeDatabase;
 
-module.exports.model = model;
-module.exports.controller = controller;
+module.exports.postgres = {
+  initializeDatabase: initializeDatabase,
+  methods: controller
+};

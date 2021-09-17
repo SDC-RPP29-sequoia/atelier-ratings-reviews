@@ -1,11 +1,13 @@
 
-import {
+import postgres from '../index.js';
+
+const {
   addReview,
   getProductReviews,
   getReview,
   getReviewMetadata,
   reportReview,
-  markReviewHelpful } from '../controllers/index.js';
+  markReviewHelpful } = postgres.methods;
 
 // ==== Test Template ====
 // For Jest usage, see: https://jestjs.io/docs/getting-started
@@ -14,7 +16,7 @@ import {
 describe('addReview', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    addReview(reviewServer)
+    //addReview(reviewServer)
   });
 });
 
@@ -22,21 +24,21 @@ describe('addReview', function () {
 describe('getProductReviews', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    getProductReviews(productReviewRequest, filter)
+    // getProductReviews(productReviewRequest, filter)
   });
 });
 
 describe('getReview', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    getReview(reviewIdFilter)
+    // getReview(reviewIdFilter)
   });
 });
 
 describe('getReviewMetadata', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    getReviewMetadata(productIdFilter)
+    // getReviewMetadata(productIdFilter)
   });
 });
 
@@ -44,14 +46,14 @@ describe('getReviewMetadata', function () {
 describe('reportReview', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    reportReview(reviewIdFilter)
+    // reportReview(reviewIdFilter)
   });
 });
 
 describe('markReviewHelpful', function () {
   it('', function () {
     // expect(wrapper.find('p').text()).toEqual('Loading...');
-    markReviewHelpful(reviewIdFilter)
+    // markReviewHelpful(reviewIdFilter)
   });
 });
 

@@ -1,6 +1,6 @@
 const adaptor = require('./adaptor.js');
-const dbPrimary = require('../mongo');
-const dbSecondary = require('../postgre');
+const dbPrimary = mongo = require('../mongo');
+const dbSecondary = postgres = require('../postgres');
 
 // This will control requests between server and primary/secondary dabatases.
 // This may be turned into a class later with state if that helps with queries.
@@ -15,9 +15,14 @@ const dbSecondary = require('../postgre');
 // 2. Completes forming contract object for sending to either DB
 // 3. Makes DB request to the appropriate database
 // 4. Receives DB request in output contract object and sends it back
+const dbModel = {
+  primary = dbPrimary,
+  secondary = dbSecondary,
+  methods = {}
+};
 
 const usePrimaryDB = false;
-module.exports.usePrimaryDB = usePrimaryDB;
+dbModel.usePrimaryDB = usePrimaryDB;
 
 const getProductReviews = (productId, page, count, sortBy) => {
   // { product_id: productId }
@@ -37,7 +42,7 @@ const getProductReviews = (productId, page, count, sortBy) => {
     })
   });
 }
-module.exports.getProductReviews = getProductReviews;
+dbModel.methods.getProductReviews = getProductReviews;
 
 const getReview = (reviewId) => {
   // { review_id: reviewId }
@@ -54,7 +59,7 @@ const getReview = (reviewId) => {
     })
   });
 }
-module.exports.getReview = getReview;
+dbModel.methods.getReview = getReview;
 
 const getReviewMetadata = (productId) => {
   // { product_id: productId }
@@ -71,7 +76,7 @@ const getReviewMetadata = (productId) => {
     })
   });
 }
-module.exports.getReviewMetadata = getReviewMetadata;
+dbModel.methods.getReviewMetadata = getReviewMetadata;
 
 const reportReview = (reviewId) => {
   // { review_id: reviewId }
@@ -88,7 +93,7 @@ const reportReview = (reviewId) => {
     })
   });
 }
-module.exports.reportReview = reportReview;
+dbModel.methods.reportReview = reportReview;
 
 const markReviewHelpful = (reviewId) => {
   // { review_id: reviewId }
@@ -105,7 +110,7 @@ const markReviewHelpful = (reviewId) => {
     })
   });
 }
-module.exports.markReviewHelpful = markReviewHelpful;
+dbModel.methods.markReviewHelpful = markReviewHelpful;
 
 const addReview = (reviewServer) => {
   return new Promise( (resolve, reject) => {
@@ -122,5 +127,6 @@ const addReview = (reviewServer) => {
     })
   });
 }
-module.exports.addReview = addReview;
+dbModel.methods.addReview = addReview;
 
+module.exports.dbModel = dbModel;
