@@ -8,11 +8,11 @@ const {
   Ratings,
   Recommended } = db;
 
-  const Review = db.Review;
-  const ReviewMetadata = db.ReviewMetadata;
-  const Characteristic = db.Characteristic;
-  const Ratings = db.Ratings;
-  const Recommended = db.Recommended;
+  // const Review = db.Review;
+  // const ReviewMetadata = db.ReviewMetadata;
+  // const Characteristic = db.Characteristic;
+  // const Ratings = db.Ratings;
+  // const Recommended = db.Recommended;
 
 // ===== Create Methods =====
 const addReview = (reviewServer) => {
@@ -50,9 +50,14 @@ const addReview = (reviewServer) => {
 module.exports.addReview = addReview;
 
 // ===== Read Methods =====
-const getProductReviews = (productIdFilter, page, count, sortBy, filter) => {
+const getProductReviews = (productReviewRequest, filter) => {
   // TODO: Implement other parameters either here or higher up. See which is better
   return new Promise( (resolve, reject) => {
+    const {
+      page, count, sortBy
+    } = productReviewRequest;
+    const productIdFilter = productReviewRequest.productId;
+
     Review.findAll({ where: productIdFilter })
     .then( reviews => {
       if (reviews === null || reviews.length === 0) {

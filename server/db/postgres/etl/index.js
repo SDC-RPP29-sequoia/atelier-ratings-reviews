@@ -1,7 +1,7 @@
 // This file will call each of the suporting ETL files, and load them in the appropriate order,
 //    doing any intermediate associations/transformations as needed
 
-const extractor = require('./csvToJson.js');
+const extractor = require('./extract/csvToJson.js');
 
 const dryRun = () => {
   const testCallback = (json, lineNumber) => {
@@ -35,38 +35,42 @@ const dryRun = () => {
 };
 
 const run = () => {
-  const characteristics = require('./characteristics.js');
-  const reviews = require('./reviews.js');
-  const reviewsToCharacteristics = require('./characteristic_reviews.js');
-  const reviewsToPhotos = require('./reviews_photos.js');
+  const characteristics = require('./transformLoad/characteristics.js');
+  const reviews = require('./transformLoad/reviews.js');
+  const reviewsToCharacteristics = require('./transformLoad/characteristic_reviews.js');
+  const reviewsToPhotos = require('./transformLoad/reviews_photos.js');
 
-  const isDryRun = true;
+  const isDryRun = false;
+  console.log('Running ETL!');
+  if (isDryRun) {
+    console.log('As a dry run');
+  }
   extractor.parseCsvFileToJson(
     characteristics.fileName,
     characteristics.transformAndLoad,
     isDryRun)
   .then(() => console.log(`Completed ETL of ${characteristics.fileName}`))
 
-  .then(() => extractor.parseCsvFileToJson(
-    reviews.fileName,
-    reviews.transformAndLoad,
-    isDryRun))
-  .then(() => console.log(`Completed ETL of ${reviews.fileName}`))
+  // .then(() => extractor.parseCsvFileToJson(
+  //   reviews.fileName,
+  //   reviews.transformAndLoad,
+  //   isDryRun))
+  // .then(() => console.log(`Completed ETL of ${reviews.fileName}`))
 
-  .then(() => extractor.parseCsvFileToJson(
-    reviewsToCharacteristics.fileName,
-    reviewsToCharacteristics.transformAndLoad,
-    isDryRun))
-  .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.fileName}`))
+  // .then(() => extractor.parseCsvFileToJson(
+  //   reviewsToCharacteristics.fileName,
+  //   reviewsToCharacteristics.transformAndLoad,
+  //   isDryRun))
+  // .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.fileName}`))
 
-  .then(() => extractor.parseCsvFileToJson(
-    reviewsToPhotos.fileName,
-    reviewsToPhotos.transformAndLoad,
-    isDryRun))
-  .then(() => console.log(`Completed ETL of ${reviewsToPhotos.fileName}`))
+  // .then(() => extractor.parseCsvFileToJson(
+  //   reviewsToPhotos.fileName,
+  //   reviewsToPhotos.transformAndLoad,
+  //   isDryRun))
+  // .then(() => console.log(`Completed ETL of ${reviewsToPhotos.fileName}`))
 
   .catch(error => console.log('Error reading CSV to Postgres database', error))
-  .finally(() => process.exit());
+  // .finally(() => process.exit());
 };
 
 

@@ -16,20 +16,25 @@ const dbSecondary = require('../postgre');
 // 3. Makes DB request to the appropriate database
 // 4. Receives DB request in output contract object and sends it back
 
+const usePrimaryDB = false;
+module.exports.usePrimaryDB = usePrimaryDB;
+
 const getProductReviews = (productId, page, count, sortBy) => {
   // { product_id: productId }
   return new Promise( (resolve, reject) => {
     const productReviewRequest = adaptor.productReviewsRequestFromServerToDatabase(productId, page, count, sortBy);
-    let results = [];
+    let filter = undefined; // TODO sort this out, including location of definition
 
-    // DB call here
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    if (error) {
+    db.getProductReviews(productReviewRequest, filter)
+    .then(results => {
+      resolve(results);
+    })
+    .catch(error => {
       console.log('getProductReviews error:', error);
       reject(error);
-    } else {
-      resolve(results);
-    }
+    })
   });
 }
 module.exports.getProductReviews = getProductReviews;
@@ -37,33 +42,33 @@ module.exports.getProductReviews = getProductReviews;
 const getReview = (reviewId) => {
   // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
-    let result = {};
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    // DB call here
-
-    if (error) {
+    db.getReview(reviewId)
+    .then(result => {
+      resolve(result);
+    })
+    .catch(error => {
       console.log('getReview error:', error);
       reject(error);
-    } else {
-      resolve(result);
-    }
+    })
   });
 }
 module.exports.getReview = getReview;
 
-const getReviewMetadata = (reviewId) => {
+const getReviewMetadata = (productId) => {
   // { product_id: productId }
   return new Promise( (resolve, reject) => {
-    let result = {};
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    // DB call here
-
-    if (error) {
+    db.getReviewMetadata(productId)
+    .then(result => {
+      resolve(result);
+    })
+    .catch(error => {
       console.log('getReviewMetadata error:', error);
       reject(error);
-    } else {
-      resolve(result);
-    }
+    })
   });
 }
 module.exports.getReviewMetadata = getReviewMetadata;
@@ -71,15 +76,16 @@ module.exports.getReviewMetadata = getReviewMetadata;
 const reportReview = (reviewId) => {
   // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    // DB call here
-
-    if (error) {
+    db.reportReview(reviewId)
+    .then(() => {
+      resolve();
+    })
+    .catch(error => {
       console.log('reportReview error:', error);
       reject(error);
-    } else {
-      resolve();
-    }
+    })
   });
 }
 module.exports.reportReview = reportReview;
@@ -87,15 +93,16 @@ module.exports.reportReview = reportReview;
 const markReviewHelpful = (reviewId) => {
   // { review_id: reviewId }
   return new Promise( (resolve, reject) => {
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    // DB call here
-
-    if (error) {
+    db.markReviewHelpful(reviewId)
+    .then(() => {
+      resolve();
+    })
+    .catch(error => {
       console.log('markReviewHelpful error:', error);
       reject(error);
-    } else {
-      resolve();
-    }
+    })
   });
 }
 module.exports.markReviewHelpful = markReviewHelpful;
@@ -103,14 +110,16 @@ module.exports.markReviewHelpful = markReviewHelpful;
 const addReview = (reviewServer) => {
   return new Promise( (resolve, reject) => {
     const review = adaptor.reviewFromServerToDatabase(reviewServer);
-    // DB call here
+    let db = usePrimaryDB ? dbPrimary.controller : dbSecondary.controller;
 
-    if (error) {
+    db.addReview(review)
+    .then(() => {
+      resolve();
+    })
+    .catch(error => {
       console.log('addReview error:', error);
       reject(error);
-    } else {
-      resolve();
-    }
+    })
   });
 }
 module.exports.addReview = addReview;

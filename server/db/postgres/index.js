@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const model = require('./models');
+const controller = require('./controllers');
 // const seedDatabase = require('./seeders/index.js');
 
 const database = 'ratings_reviews';
@@ -65,3 +66,4 @@ const initializeDatabase = (eraseDatabaseOnSync, callback) => {
 module.exports.initializeDatabase = initializeDatabase;
 
 module.exports.model = model;
+module.exports.controller = controller;

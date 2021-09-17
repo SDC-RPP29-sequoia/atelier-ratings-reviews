@@ -1,11 +1,11 @@
-const db = require('../models');
+const db = require('../../models');
 
 const {
   Characteristic,
   Review,
   ReviewToCharacteristic } = db;
 
-// Add characteristic_reviews (1.58 GB)
+// Add characteristic_reviews (19,327,575 entries - 1.58 GB)
 //    adds associations for characteristics to reviews
 //    generates data for these associations
 

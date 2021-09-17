@@ -1,11 +1,11 @@
-const db = require('../models');
+const db = require('../../models');
 
 const {
   Photo,
   ReviewToPhoto,
   Review } = db;
 
-// Add reviews_photos (476 MB)
+// Add reviews_photos (2,742,540 entries - 476 MB)
 //    generates all photos
 //    adds associations for photos to reviews
 

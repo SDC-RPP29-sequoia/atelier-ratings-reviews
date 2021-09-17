@@ -1,4 +1,4 @@
-const db = require('../models');
+const db = require('../../models');
 
 const {
   Product,
@@ -6,7 +6,7 @@ const {
   Review,
   ReviewMetadata } = db;
 
-// Add reviews (2.87 GB)
+// Add reviews (5,774,952 entries - 2.87 GB)
 //    generates all profiles, reviews
 //    generates data for metadata
 //      generates recommended, ratings (for product, for characteristic)

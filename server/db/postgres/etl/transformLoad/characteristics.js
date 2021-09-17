@@ -1,11 +1,11 @@
-const db = require('../models');
+const db = require('../../models');
 
 const {
   Characteristic,
   Product,
   ReviewMetadata } = db;
 
-// Add characteristics (185 MB)
+// Add characteristics (3,347,678 entries - 185 MB)
 //    generates all products, metadata, characteristics
 
 const fileName = 'characteristics.csv';
@@ -13,11 +13,11 @@ module.exports.fileName = fileName;
 
 // { id: '1', product_id: '1', name: 'Fit' }
 module.exports.transformAndLoad = (json, lineNumber) => {
-  console.log('Characteristic ETL', json);
   return new Promise((resolve, reject) => {
+    // console.log('Characteristic ETL', json);
     getMetadataId(json.product_id)
     .then(metadataId => {
-      console.log('getMetadataId complete', metadataId);
+      // console.log('getMetadataId complete', metadataId);
       const characteristicId = parseInt(json.id);
       Characteristic.findOrCreate({
         where: { characteristic_id: characteristicId },
@@ -29,7 +29,7 @@ module.exports.transformAndLoad = (json, lineNumber) => {
       })
       .then(result => {
         const characteristic = result[0].get();
-        console.log('Characteristic.findOrCreate: ', characteristic.id);
+        // console.log('Characteristic.findOrCreate: ', characteristic.id);
         resolve(characteristic);
       });
     })
@@ -41,8 +41,8 @@ module.exports.transformAndLoad = (json, lineNumber) => {
 };
 
 const getMetadataId = (product_id) => {
-  console.log('getMetadataId: product_id:', product_id);
   return new Promise((resolve, reject) => {
+    // console.log('getMetadataId: product_id:', product_id);
     const productId = parseInt(product_id);
     Product.findOrCreate({
       where: { product_id: productId },
@@ -59,7 +59,7 @@ const getMetadataId = (product_id) => {
         .then(rows => {
           const metadata = rows[0]?.get();
           if (metadata) {
-            console.log('ReviewMetadata.findOrCreate: ', metadata.id);
+            // console.log('ReviewMetadata.findOrCreate: ', metadata.id);
             resolve(metadata.id);
           } else {
             console.log(`Failed to add metadata corresponding to product external ID ${product_id}`);
@@ -76,7 +76,7 @@ const getMetadataId = (product_id) => {
           .then(row => {
             const metadata = row?.get();
             if (metadata) {
-              console.log('ReviewMetadata.findOne: ', metadata.id);
+              // console.log('ReviewMetadata.findOne: ', metadata.id);
               resolve(metadata.id);
             } else {
               console.log(`ReviewMetadata.findOne failed to find metadata for product ID ${product.id}`);
@@ -95,7 +95,7 @@ const getMetadataId = (product_id) => {
           });
         }
 
-        findMetaDataId(resolve, reject, 4);
+        findMetaDataId(resolve, reject, 400);
       }
     })
     .catch(error => {
