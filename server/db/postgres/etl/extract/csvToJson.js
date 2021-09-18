@@ -38,16 +38,11 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
           queue.push(json);
           if (queue.length >= currentChunkSize) {
             console.log(`Writing JSON batch to database up to line ${lineNumber}`);
-            // Grow chunk size exponentially until cap is reached
-            // TODO: This can probably be internalized inside chunk objects later
-            if (currentChunkSize < 2) {
-              currentChunkSize += 1;
-            } else if (currentChunkSize < maxChunkSize){
-              currentChunkSize = Math.min(currentChunkSize * currentChunkSize, maxChunkSize);
-            }
-
+            currentChunkSize = DatabaseQueue.getNewChunkSize(currentChunkSize, maxChunkSize);
+            // console.log('Current Chunk Size', currentChunkSize);
             // Create queue and immediately invoke it to run synchronously
-            const databaseQueue = new DatabaseQueue(queue,
+            const databaseQueue = new DatabaseQueue(
+              queue,
               lineNumber,
               callbackDB,
               () => {
@@ -101,7 +96,7 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
       .pipe(writeStreamDB)
       .on('finish', () => {
         if (queue.length > 0) {
-          console.log(`=== Writing JSON batch to database up to EOF (${lineNumber} lines) ===`);
+          console.log(`\n=== Writing JSON batch to database up to EOF (${lineNumber} lines) ===`);
           console.log(`For file: ${fileName}`);
 
           // Create queue and immediately invoke it to run synchronously
@@ -115,7 +110,7 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
           databaseQueueCollection.pushAndExecute(databaseQueue);
         }
 
-        console.log('Executing queues!');
+        console.log('\nExecuting queues!');
         databaseQueueCollection.pushAndExecute();
 
         const queuesDb = [];
@@ -125,12 +120,12 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
 
         Promise.all(queuesDb)
         .then(() => {
-          console.log('🍺🍺🍺🍺 File ETL Success! 🍺🍺🍺🍺');
-          console.log(`🍺🍺🍺🍺 ${lineNumber} entries processed from file:`, fileName);
+          console.log('\n🍺🍺🍺🍺 File ETL Queue Load Success! 🍺🍺🍺🍺');
+          console.log(`🍺🍺🍺🍺 ${lineNumber} entries to be processed from file:`, fileName);
           resolve();
         })
         .catch(error => {
-          console.log('❌❌❌❌ Batch Failure! ❌❌❌❌');
+          console.log('\n❌❌❌❌ Batch Failure! ❌❌❌❌');
           console.log(`❌❌❌❌ Failed to process file:`, fileName);
           console.log(error);
           reject(error);
@@ -139,7 +134,7 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
     });
 
     readStream.on('error', (error) => {
-      console.log(`Error reading file ${filePath}`, error);
+      console.log(`\nError reading file ${filePath}`, error);
       process.exit();
     });
   });

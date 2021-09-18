@@ -15,7 +15,11 @@ class RunQueue {
   }
 
   ableToRun() {
-    return (this.running.size < this.maxConcurrentRuns);
+    return (0 < this.ready.size && this.running.size < this.maxConcurrentRuns);
+  }
+
+  allHaveRun() {
+    return (this.ran.size === this.collection.length);
   }
 
   dequeueReady() {
@@ -36,6 +40,8 @@ class RunQueue {
 
   dequeueRunningFailed(callback) {
     this.running.delete(callback);
+    console.log('\n❌❌❌❌ Chunk failed to run to completion! ❌❌❌❌');
+    console.log(`❌❌❌❌ ${this.ran.size} of ${this.collection.length} total callbacks ran ❌❌❌❌`);
   }
 
   isRunning() {
@@ -60,6 +66,18 @@ class CallbackChunk extends RunQueue {
     this.enqueue(jsonQueue, callback, emptyQueueCB);
   }
 
+  // Grow chunk size exponentially until cap is reached
+  static getNewChunkSize(currentChunkSize, maxChunkSize = 10000, rate = 'exponential') {
+    if (currentChunkSize < 2 || rate === 'linear') {
+      currentChunkSize = Math.min(currentChunkSize + 1, maxChunkSize);
+    } else if (rate === 'double') {
+      currentChunkSize = Math.min(currentChunkSize * 2, maxChunkSize);
+    } else if (rate === 'exponential'){
+      currentChunkSize = Math.min(currentChunkSize * currentChunkSize, maxChunkSize);
+    }
+    return currentChunkSize;
+  }
+
   enqueue(jsonQueue, callback, emptyQueueCB) {
     let lineNumber = this.initialLineNumber;
 
@@ -76,29 +94,30 @@ class CallbackChunk extends RunQueue {
       if (this.isRunning() && !this.allRun()) {
         // Ignore redundant execution call
         resolve();
-    } else if (!this.allRun()) {
-      const callback = this.dequeueReady();
-      const index = this.collection.indexOf(callback);
+      } else if (!this.allRun()) {
+        const callback = this.dequeueReady();
+        const index = this.collection.indexOf(callback);
 
-      // console.log(`Executing callback at index ${index}`);
-      this.running.add(callback);
-      process.stdout.write(`\rRunning callback ${index + 1} in chunk of
-        ${this.ran.size} entries processed from lines ${this.initialLineNumber} to ${this.maxLineNumber}...`);
+        // console.log(`Executing callback at index ${index}`);
+        this.running.add(callback);
+        // process.stdout.write(`\rRunning callback ${index + 1} in chunk of
+        //   ${this.ran.size} entries processed from lines ${this.initialLineNumber} to ${this.maxLineNumber}...`);
 
-      callback()
-      .then(() => {
-        this.dequeueRunningComplete(callback);
-        return this.executeSync();
-      })
-      .catch(error => {
-        console.log('❌❌❌❌ Batch Failure! ❌❌❌❌');
-        console.log(`❌❌❌❌ Failed to synchronously process an entry at index ${index}
-          within lines ${this.initialLineNumber} to ${this.maxLineNumber}! ❌❌❌❌`);
-        this.dequeueRunningFailed(callback);
-        reject(error);
-      })
+        callback()
+        .then(() => {
+          this.dequeueRunningComplete(callback);
+          process.stdout.write(`\r ${this.ran.size} entries processed from lines ${this.initialLineNumber} to ${this.maxLineNumber}...`);
+          this.executeSync().then(resolve());
+        })
+        .catch(error => {
+          console.log('\n❌❌❌❌ Batch Failure! ❌❌❌❌');
+          console.log(`❌❌❌❌ Failed to synchronously process an entry at index ${index}
+            within lines ${this.initialLineNumber} to ${this.maxLineNumber}! ❌❌❌❌`);
+          this.dequeueRunningFailed(callback);
+          reject(error);
+        })
       } else {
-        console.log('🍺🍺🍺🍺 Batch Success! 🍺🍺🍺🍺');
+        console.log('\n🍺🍺🍺🍺 Batch Success! 🍺🍺🍺🍺');
         console.log(`🍺🍺🍺🍺 ${this.ran.size} entries processed from lines ${this.initialLineNumber} to ${this.maxLineNumber}! 🍺🍺🍺🍺`);
         resolve();
       }
@@ -139,8 +158,34 @@ class CallbackChunk extends RunQueue {
 module.exports.DatabaseQueue = CallbackChunk;
 
 class CallbackChunkCollection extends RunQueue {
-  constructor(maxConcurrentRuns = 100) {
+  constructor(runAll = true, maxConcurrentRuns = 100) {
     super(maxConcurrentRuns);
+
+    this.runAll = runAll;
+  }
+
+  totalCallbacks() {
+    let length = 0;
+    this.collection.forEach(chunk => {
+      length += chunk.collection.length;
+    });
+    return length;
+  }
+
+  totalCallbacksRunning() {
+    let runs = 0;
+    this.collection.forEach(chunk => {
+      runs += chunk.running.size;
+    });
+    return runs;
+  }
+
+  totalCallbacksRan() {
+    let runs = 0;
+    this.collection.forEach(chunk => {
+      runs += chunk.ran.size;
+    });
+    return runs;
   }
 
   execute(cbChunk) {
@@ -161,7 +206,21 @@ class CallbackChunkCollection extends RunQueue {
     cbChunk.executeSync()
     .then(() => {
       this.dequeueRunningComplete(cbChunk);
-      return true;
+      console.log('\n🍺🍺🍺🍺 Completed running all chunk callbacks 🍺🍺🍺🍺');
+      console.log(`🍺🍺🍺🍺 ${cbChunk.ran.size} of ${cbChunk.collection.length} total callbacks ran 🍺🍺🍺🍺`);
+
+      // Pause briefly in case this finished a smaller chunk while more chunks are being loaded, then load next chunk if available
+      setTimeOut(() => {}, 50);
+      if (this.runAll && this.ableToRun()) {
+        console.log('Running next chunk collection');
+        this.execute();
+      } else if (this.allHaveRun()) {
+        console.log('🍺🍺🍺🍺 Completed running all chunk collections!! 🍺🍺🍺🍺');
+        console.log(`🍺🍺🍺🍺 ${this.totalCallbacksRan()} of ${this.totalCallbacks()} total callbacks ran 🍺🍺🍺🍺`)
+        return true;
+      } else {
+        return false;
+      }
     })
     .catch(error => {
       console.log('Error in running queued item', error);

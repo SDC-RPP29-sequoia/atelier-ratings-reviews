@@ -40,6 +40,29 @@ module.exports.transformAndLoad = (json, lineNumber) => {
   });
 };
 
+const findOrCreateMetadata = (product_id) => {
+  return new Promise((resolve, reject) => {
+    ReviewMetadata.findOrCreate({
+      where: { product_id: product_id },
+      defaults: { product_id: product_id }
+    })
+    .then(rows => {
+      const metadata = rows[0]?.get();
+      if (metadata) {
+        // console.log('ReviewMetadata.findOrCreate: ', metadata.id);
+        resolve(metadata.id);
+      } else {
+        console.log(`Failed to add metadata corresponding to product external ID ${product_id}`);
+        reject();
+      }
+    })
+    .catch(error => {
+      console.log(`Failed to add metadata corresponding to product external ID ${product_id}`, error);
+      reject(error);
+    });
+  })
+}
+
 const getMetadataId = (product_id) => {
   return new Promise((resolve, reject) => {
     // console.log('getMetadataId: product_id:', product_id);
@@ -52,24 +75,7 @@ const getMetadataId = (product_id) => {
       const product = rows[0].get();
       const created = rows[1];
       if (created) {
-        ReviewMetadata.findOrCreate({
-          where: { product_id: product.id },
-          defaults: { product_id: product.id }
-        })
-        .then(rows => {
-          const metadata = rows[0]?.get();
-          if (metadata) {
-            // console.log('ReviewMetadata.findOrCreate: ', metadata.id);
-            resolve(metadata.id);
-          } else {
-            console.log(`Failed to add metadata corresponding to product external ID ${product_id}`);
-            reject();
-          }
-        })
-        .catch(error => {
-          console.log(`Failed to add metadata corresponding to product external ID ${product_id}`, error);
-          reject(error);
-        });
+        findOrCreateMetadata(product.id).then(result => resolve(result));
       } else {
         const findMetaDataId = (resolve, reject, limit = 0) => {
           ReviewMetadata.findOne({ where: { product_id: product.id } })
@@ -85,7 +91,7 @@ const getMetadataId = (product_id) => {
                 console.log(`Waiting 50 ms and trying again...`);
                 setTimeout(() => findMetaDataId(resolve, reject, limit--), 50);
               } else {
-                reject();
+                findOrCreateMetadata(product.id).then(result => resolve(result));
               }
             }
           })
@@ -95,7 +101,7 @@ const getMetadataId = (product_id) => {
           });
         }
 
-        findMetaDataId(resolve, reject, 400);
+        return findMetaDataId(resolve, reject, 20);
       }
     })
     .catch(error => {
