@@ -11,6 +11,8 @@ module.exports = {
         star_3: null,
         star_4: 1,
         star_5: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -19,6 +21,8 @@ module.exports = {
         star_3: 1,
         star_4: 2,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -27,6 +31,8 @@ module.exports = {
         star_3: null,
         star_4: 1,
         star_5: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -35,6 +41,8 @@ module.exports = {
         star_3: null,
         star_4: 1,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -43,6 +51,8 @@ module.exports = {
         star_3: null,
         star_4: null,
         star_5: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -51,6 +61,8 @@ module.exports = {
         star_3: 3,
         star_4: null,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -59,6 +71,8 @@ module.exports = {
         star_3: null,
         star_4: null,
         star_5: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -67,6 +81,8 @@ module.exports = {
         star_3: 1,
         star_4: null,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -75,6 +91,8 @@ module.exports = {
         star_3: 1,
         star_4: null,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         star_0: null,
@@ -83,6 +101,8 @@ module.exports = {
         star_3: null,
         star_4: null,
         star_5: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
     ],
     {},

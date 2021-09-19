@@ -1,0 +1,1 @@
+pg_dump -U markthomas -d ratings_reviews_dev -f ratings_reviews_dev.sql

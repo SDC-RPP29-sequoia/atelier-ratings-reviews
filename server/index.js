@@ -1,23 +1,20 @@
 const app = require('./app.js');
 const port = 3000;
 
-const eraseDatabaseOnSync = false;//true;
+const mongo = require('./db/mongo')(); // Can add env/config variable here
+const postgres = require('./db/postgres')(); // Can add env/config variable here
 
-// Primary DB
-const mongo = require('./db/mongo');
-mongo.initializeDatabase(eraseDatabaseOnSync,
-  () => {
-    console.log('Mongo DB started');
-  }
-);
+Promise.all([
+  mongo(() => { console.log('Mongo DB started'); }),
+  postgres(() => { console.log('Postgres DB started'); })
+])
+.then(() => {
+  app.listen(port, () => {
+    console.log(`NSA is listening in at http://localhost:${port}`);
+  })
+})
+.catch(error => {
+  console.log('Error in making database connections', error);
+});
 
-// Secondary DB
-const postgres = require('./db/postgres')
-postgres.initializeDatabase(eraseDatabaseOnSync,
-  () => {
-    console.log('Postgres DB started');
-    app.listen(port, () => {
-      console.log(`NSA is listening in at http://localhost:${port}`);
-    })
-  }
-);
+module.exports = app;

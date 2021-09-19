@@ -3,18 +3,27 @@ dotenv.config({ path: `${__dirname}/.env`  });
 
 module.exports = {
   development: {
-    // username: process.env.USERNAME,
-    // password: process.env.PASSWORD,
-    url: process.env.DEV_DATABASE_URL
+    url: process.env.DEV_DATABASE_URL_MONGO,
+    database: process.env.DEV_DATABASE_MONGO,
+    host: process.env.HOST,
+    port: process.env.PORT_MONGO,
+    username: process.env.USERNAME_MONGO,
+    password: process.env.PASSWORD_MONGO,
   },
   test: {
-    // username: process.env.USERNAME,
-    // password: process.env.PASSWORD,
-    url: process.env.TEST_DATABASE_URL
+    url: process.env.TEST_DATABASE_URL_MONGO,
+    database: process.env.TEST_DATABASE_MONGO,
+    host: process.env.HOST,
+    port: process.env.PORT_MONGO,
+    username: process.env.USERNAME_MONGO,
+    password: process.env.PASSWORD_MONGO,
   },
   production: {
-    // username: process.env.USERNAME,
-    // password: process.env.PASSWORD,
-    url: process.env.DATABASE_URL
+    url: process.env.DATABASE_URL_MONGO,
+    database: process.env.DATABASE_MONGO,
+    host: process.env.HOST,
+    port: process.env.PORT_MONGO,
+    username: process.env.USERNAME_MONGO,
+    password: process.env.PASSWORD_MONGO,
   },
 };

@@ -1,12 +1,6 @@
-import dbModel from '../index.js';
+// import dbModel from '../index.js';
 
-const {
-  addReview,
-  getProductReviews,
-  getReview,
-  getReviewMetadata,
-  reportReview,
-  markReviewHelpful } = dbModel.methods;
+// const db = dbModel.methods;
 
 // ==== Test Template ====
 // For Jest usage, see: https://jestjs.io/docs/getting-started

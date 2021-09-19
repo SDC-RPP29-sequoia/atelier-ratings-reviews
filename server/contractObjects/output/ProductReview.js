@@ -9,7 +9,7 @@ class ProductReview {
     this.response = null;
     this.date = null;
     this.helpfulness = null;
-    this.photos = [];
+    this.photos = [];         // { id: 5, url: 'http://foo.bar' }
   }
 }
 module.exports.ProductReview = ProductReview;

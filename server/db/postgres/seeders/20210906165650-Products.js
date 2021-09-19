@@ -5,16 +5,24 @@ module.exports = {
     'product',
     [
       {
-        product_id: 1
+        product_id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        product_id: 2
+        product_id: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        product_id: 3
+        product_id: 3,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        product_id: 4
+        product_id: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
     ],
     {},

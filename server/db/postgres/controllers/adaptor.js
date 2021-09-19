@@ -1,10 +1,12 @@
-const ProductReview = require('../../contractObjects/output/ProductReview.js');
-const Review = require('../../contractObjects/output/Review.js');
-const ReviewMetadata = require('../../contractObjects/output/ReviewMetadata.js');
+const ProductReview = require('../../../contractObjects/output/ProductReview.js');
+const ProductReviews = require('../../../contractObjects/output/ProductReviews.js');
+const Review = require('../../../contractObjects/output/Review.js');
+const ReviewMetadata = require('../../../contractObjects/output/ReviewMetadata.js');
 
-const productReviewsToOutput = (reviews) => {
-  // TBD: product_id
-  const productReviewsOutput = [];
+const productReviewsToOutput = (reviews, productReviewRequest) => {
+  const { productId, page, count } = productReviewRequest;
+
+  const productReviewsOutput = new ProductReviews(productId, page, count);
   reviews.forEach(review => {
     const reviewOutput = new ProductReview();
 
@@ -19,7 +21,7 @@ const productReviewsToOutput = (reviews) => {
     reviewOutput.helpfulness = review.helpfulness;
     reviewOutput.photos = review; // TBD
 
-    productReviewsOutput.push(reviewOutput);
+    productReviewsOutput.results.push(reviewOutput);
   })
   return productReviewsOutput;
 }

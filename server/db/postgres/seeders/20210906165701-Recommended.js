@@ -6,15 +6,21 @@ module.exports = {
     [
       {
         true: 1,
-        false: 1
+        false: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         true: 3,
-        false: 2
+        false: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         true: 2,
-        false: 1
+        false: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
     ],
     {},

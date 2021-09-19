@@ -1,6 +1,6 @@
 const adaptor = require('./adaptor.js');
-const dbPrimary = mongo = require('../mongo');
-const dbSecondary = postgres = require('../postgres');
+const dbPrimary = require('../mongo')();
+const dbSecondary = require('../postgres')();
 
 // This will control requests between server and primary/secondary dabatases.
 // This may be turned into a class later with state if that helps with queries.
@@ -16,9 +16,9 @@ const dbSecondary = postgres = require('../postgres');
 // 3. Makes DB request to the appropriate database
 // 4. Receives DB request in output contract object and sends it back
 const dbModel = {
-  primary = dbPrimary,
-  secondary = dbSecondary,
-  methods = {}
+  primary: dbPrimary,
+  secondary: dbSecondary,
+  methods: {}
 };
 
 const usePrimaryDB = false;
@@ -129,4 +129,4 @@ const addReview = (reviewServer) => {
 }
 dbModel.methods.addReview = addReview;
 
-module.exports.dbModel = dbModel;
+module.exports = dbModel;

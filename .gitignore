@@ -122,3 +122,5 @@ login.sh
 data
 parseCsvToJson.sh
 installation
+
+*.sql

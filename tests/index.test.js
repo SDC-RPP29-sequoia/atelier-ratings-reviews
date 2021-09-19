@@ -1,4 +1,4 @@
-import app from '../index.js';
+// import app from '../server/index.js';
 
 // ==== Test Template ====
 // For Jest usage, see: https://jestjs.io/docs/getting-started
