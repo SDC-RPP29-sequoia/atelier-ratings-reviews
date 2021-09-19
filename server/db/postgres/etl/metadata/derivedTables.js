@@ -1,4 +1,5 @@
-const db = require('../../models');
+const env = process.env.NODE_ENV || 'development';
+const db = require('../../models'); // (env)
 
 const {
   Product,

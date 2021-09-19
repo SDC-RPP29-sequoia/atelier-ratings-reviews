@@ -6,18 +6,18 @@ const csv = require('csvtojson');
 const { DatabaseQueue, DatabaseQueueCollection } =
     { CallbackChunk, CallbackChunkCollection } = require('./callbackQueues.js');
 
-const getFilePath = (fileName, dryRun) => {
+const getFilePath = (filename, dryRun) => {
   let initialPath = '../../../../data/raw';
   if (dryRun) {
     initialPath += '/sample';
-    fileName = fileName.replace('.csv', '_sample.csv');
+    filename = filename.replace('.csv', '_sample.csv');
   }
-  return path.resolve(initialPath, fileName);
+  return path.resolve(initialPath, filename);
 }
 
-module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxChunkSize = 10000) => {
+module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000) => {
   return new Promise((resolve, reject) => {
-    const filePath = getFilePath(fileName, dryRun);
+    const filePath = getFilePath(filename, dryRun);
 
     // Open the file as a readable stream
     const readStream = fs.createReadStream(filePath);
@@ -64,7 +64,7 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
     // This will wait until we know the readable stream is actually valid before piping
     readStream.on('open', () => {
       // This just pipes the read stream to the response object
-      console.log(`Stream has been opened for file ${fileName}`);
+      console.log(`Stream has been opened for file ${filename}`);
       readStream
       // Old, direct method. Stream overwhelms DB in large files
       // .pipe(
@@ -97,7 +97,7 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
       .on('finish', () => {
         if (queue.length > 0) {
           console.log(`\n=== Writing JSON batch to database up to EOF (${lineNumber} lines) ===`);
-          console.log(`For file: ${fileName}`);
+          console.log(`For file: ${filename}`);
 
           // Create queue and immediately invoke it to run synchronously
           const databaseQueue = new DatabaseQueue(queue,
@@ -121,12 +121,12 @@ module.exports.parseCsvFileToJson = (fileName, callbackDB, dryRun = false, maxCh
         Promise.all(queuesDb)
         .then(() => {
           console.log('\n🍺🍺🍺🍺 File ETL Queue Load Success! 🍺🍺🍺🍺');
-          console.log(`🍺🍺🍺🍺 ${lineNumber} entries to be processed from file:`, fileName);
+          console.log(`🍺🍺🍺🍺 ${lineNumber} entries to be processed from file:`, filename);
           resolve();
         })
         .catch(error => {
           console.log('\n❌❌❌❌ Batch Failure! ❌❌❌❌');
-          console.log(`❌❌❌❌ Failed to process file:`, fileName);
+          console.log(`❌❌❌❌ Failed to process file:`, filename);
           console.log(error);
           reject(error);
         });

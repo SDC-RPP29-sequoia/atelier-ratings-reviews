@@ -210,7 +210,7 @@ class CallbackChunkCollection extends RunQueue {
       console.log(`🍺🍺🍺🍺 ${cbChunk.ran.size} of ${cbChunk.collection.length} total callbacks ran 🍺🍺🍺🍺`);
 
       // Pause briefly in case this finished a smaller chunk while more chunks are being loaded, then load next chunk if available
-      setTimeOut(() => {}, 50);
+      setTimeout(() => {}, 50);
       if (this.runAll && this.ableToRun()) {
         console.log('Running next chunk collection');
         this.execute();
