@@ -7,11 +7,12 @@ class ReviewInput {
     this.recommend = data.recommend; // Value indicating if the reviewer recommends the product
     this.name = data.name; // Username for question asker
     this.email = data.email; // Email address for question asker
+    this.date = new Date();
     this.photos = data.photos; // Array of text urls that link to images to be shown
     this.characteristics = [];
 
     // Property validation
-    if (this.rating < 0) {
+    if (this.rating < 0 || this.rating === undefined || this.rating === null) {
       this.rating = 0;
     } else
     if (this.rating > 5) {
@@ -33,4 +34,4 @@ class ReviewInput {
     }
   }
 }
-module.exports.ReviewInput = ReviewInput;
+module.exports = ReviewInput;

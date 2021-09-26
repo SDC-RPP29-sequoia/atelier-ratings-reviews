@@ -10,13 +10,32 @@ module.exports = (db, filename = 'characteristic_reviews.csv') => {
   // { id: '1', characteristic_id: '1', review_id: '1', value: '4' }
   const transformAndLoad = (json, lineNumber) => {
     return new Promise((resolve, reject) => {
+      ReviewToCharacteristic.findOne({ where: {
+        review_id: json.review_id,
+        characteristic_id: json.characteristic_id,
+      }})
+      .then(row => {
+        const reviewToCharacteristic = row?.get();
+        if (reviewToCharacteristic) {
+          resolve(reviewToCharacteristic);
+        } else {
+          createReviewsCharacteristics(json, filename, lineNumber)
+          .then(reviewToCharacteristic => resolve(reviewToCharacteristic))
+          .catch(error => reject(error));
+        }
+      })
+    });
+  };
+
+  const createReviewsCharacteristics = (json, lineNumber) => {
+    return new Promise((resolve, reject) => {
       const reviewIdExternal = parseInt(json.review_id);
       const getReviewId = new Promise((resolve, reject) => {
         Review.findOne({ where: {review_id: reviewIdExternal }})
         .then(review => {
           const reviewId = review.id;
           if (reviewId) {
-            console.log('Review.findOne: ', reviewId);
+            // console.log('Review.findOne: ', reviewId);
             resolve(reviewId);
           } else {
             console.log(`Review.findOne failed to find review for external ID ${reviewIdExternal}`, error);
@@ -35,7 +54,7 @@ module.exports = (db, filename = 'characteristic_reviews.csv') => {
         .then(characteristic => {
           const characteristicId = characteristic.id;
           if (characteristicId) {
-            console.log('Characteristic.findOne: ', characteristicId);
+            // console.log('Characteristic.findOne: ', characteristicId);
             resolve(characteristicId);
           } else {
             console.log(`Characteristic.findOne failed to find characteristic for external ID ${characteristicIdExternal}`);
@@ -51,11 +70,11 @@ module.exports = (db, filename = 'characteristic_reviews.csv') => {
       Promise.all([getReviewId, getCharacteristicId])
       .then(ids => {
         const reviewId = ids[0];
-        console.log('reviewId: ', reviewId);
+        // console.log('reviewId: ', reviewId);
         const characteristicId = ids[1];
-        console.log('characteristicId: ', characteristicId);
+        // console.log('characteristicId: ', characteristicId);
         const rating = parseInt(json.value);
-        console.log('rating: ', rating);
+        // console.log('rating: ', rating);
 
         ReviewToCharacteristic.findOrCreate({
           where: {
@@ -70,7 +89,7 @@ module.exports = (db, filename = 'characteristic_reviews.csv') => {
         })
         .then(result => {
           const reviewToCharacteristic = result[0].get();
-          console.log('ReviewToCharacteristic.findOrCreate: ', reviewToCharacteristic);
+          // console.log('ReviewToCharacteristic.findOrCreate: ', reviewToCharacteristic);
           resolve(reviewToCharacteristic);
         })
         .catch(error => {

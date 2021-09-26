@@ -1,4 +1,4 @@
-class ReviewMetaData {
+class ReviewMetadata {
   constructor(product_id) {
     this.product_id = product_id;
     this.ratings = {};          // { 1: 3, 4: 5, 5: 5 }
@@ -7,13 +7,17 @@ class ReviewMetaData {
   }
 
   addRating(star, count) {
-    this.ratings[star] = count;
+    const starProperty = parseInt(star);
+    if (count && starProperty) {
+      this.ratings[starProperty] = count;
+    }
   }
 
   addRecommended(recommended, count) {
-    if (recommended) {
+    const recommendedBool = eval(recommended);
+    if (recommendedBool && count > 0) {
       this.recommended.true = count;
-    } else {
+    } else if (count > 0) {
       this.recommended.false = count;
     }
   }
@@ -25,4 +29,4 @@ class ReviewMetaData {
     }
   }
 }
-module.exports.ReviewMetaData = ReviewMetaData;
+module.exports = ReviewMetadata;

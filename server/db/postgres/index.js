@@ -91,20 +91,10 @@ module.exports = (envOrConfigIn) => {
         isDatabaseReset = dbReset;
         connectDatabase();
       })
-      .then(sequelizeInstance => {
-        // sequelize = sequelizeInstance;
+      .then(() => {
         sequelize.authenticate();
       })
       .then(() => {
-        // console.log('Connection to Postgres has been established successfully.');
-        // if (eraseDatabaseOnSync || envOrConfig === 'test') {
-        //   console.log('Resetting Postgres database')
-        //   resetDatabase(callback)
-        //   .then(() => {
-        //     console.log('Postgres database reset');
-        //     resolve();
-        //   })
-        // } else {
         if (isDatabaseReset) {
           callback();
           resolve();
@@ -148,6 +138,7 @@ module.exports = (envOrConfigIn) => {
         console.log('Postgres model built!');
         resolve({
           envOrConfig: envOrConfig,
+          Sequelize: Sequelize,
           sequelize: sequelize,
           initializeDatabase: initializeDatabase,
           resetDatabase: resetDatabase,

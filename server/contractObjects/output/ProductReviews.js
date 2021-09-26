@@ -6,4 +6,4 @@ class ProductReviews {
     this.results = [] // Contains ProductReview objects
   }
 }
-module.exports.ProductReviews = ProductReviews;
+module.exports = ProductReviews;

@@ -22,4 +22,4 @@ class ProductReviewsRequest {
     this.sortBy = sortBy;
   }
 }
-module.exports.ProductReviewsRequest = ProductReviewsRequest;
+module.exports = ProductReviewsRequest;

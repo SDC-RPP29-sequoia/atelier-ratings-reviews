@@ -14,8 +14,10 @@ const getFilePath = (filename, dryRun) => {
   }
   return path.resolve(initialPath, filename);
 }
-
-module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000) => {
+// 19,327,575 entries - characteristics to reviews
+// 2,742,540 entries - photos to reviews
+const lineNumberMultiple = 0;
+module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000, maxCollectionRun = 100) => {
   return new Promise((resolve, reject) => {
     const filePath = getFilePath(filename, dryRun);
 
@@ -23,7 +25,8 @@ module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxCh
     const readStream = fs.createReadStream(filePath);
 
     // Create queues to batch data into for database insertion in chunks
-    const databaseQueueCollection = new DatabaseQueueCollection();
+    let runAll = true;
+    const databaseQueueCollection = new DatabaseQueueCollection(runAll, maxCollectionRun);
     let queue = [];
     const emptyQueue = () => {
       queue = [];
@@ -35,27 +38,32 @@ module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxCh
         write: (json, encoding, callback) => {
           // console.log('Piping JSON', json);
           lineNumber++;
-          queue.push(json);
-          if (queue.length >= currentChunkSize) {
-            console.log(`Writing JSON batch to database up to line ${lineNumber}`);
-            currentChunkSize = DatabaseQueue.getNewChunkSize(currentChunkSize, maxChunkSize);
-            // console.log('Current Chunk Size', currentChunkSize);
-            // Create queue and immediately invoke it to run synchronously
-            const databaseQueue = new DatabaseQueue(
-              queue,
-              lineNumber,
-              callbackDB,
-              () => {
-                emptyQueue();
-                callback();
-              }
-            );
-            databaseQueueCollection.pushAndExecute(databaseQueue);
+          if ((lineNumberMultiple * 1000000) < lineNumber && lineNumber <= (lineNumberMultiple + 2) * 1000000) { // Current cap since memory issues
+            queue.push(json);
+            if (queue.length >= currentChunkSize) {
+              console.log(`Writing JSON batch to database up to line ${lineNumber}`);
+              currentChunkSize = DatabaseQueue.getNewChunkSize(currentChunkSize, maxChunkSize);
+              // console.log('Current Chunk Size', currentChunkSize);
+              // Create queue and immediately invoke it to run synchronously
+              const databaseQueue = new DatabaseQueue(
+                queue,
+                lineNumber,
+                callbackDB,
+                () => {
+                  emptyQueue();
+                  callback();
+                }
+              );
+              databaseQueueCollection.pushAndExecute(databaseQueue);
+            } else {
+              // console.log(`Adding to queue line ${lineNumber}`);
+              callback();
+            }
           } else {
-            // console.log(`Adding to queue line ${lineNumber}`);
+            // console.log('Next line...');
             callback();
           }
-        } ,
+        },
         objectMode: true
     });
 
@@ -65,33 +73,8 @@ module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxCh
     readStream.on('open', () => {
       // This just pipes the read stream to the response object
       console.log(`Stream has been opened for file ${filename}`);
+      // node object for memory management. e.g. process object? Under 250 MB
       readStream
-      // Old, direct method. Stream overwhelms DB in large files
-      // .pipe(
-      //   csv()
-      //   .subscribe(
-      //     (json, lineNumber) => {
-      //       //single json object will be emitted for each csv line & parsed asynchronously
-      //       promises.push(callback(json, lineNumber));
-      //     },
-      //     (error) => {
-      //       console.log(`Error parsing CSV file ${filePath}`, error);
-      //       process.exit();
-      //       reject();
-      //     },
-      //     () => {
-      //       Promise.all(promises)
-      //         .then(ids => {
-      //           console.log('%c🍺🍺🍺🍺 Success! 🍺🍺🍺🍺', 'color:green;');
-      //           console.log(`${ids.length} entries processed!`);
-      //           resolve();
-      //         });
-      //     }
-      //   )
-      // )
-
-// node object for memory management. e.g. process object? Under 250 MB
-
       .pipe(csv({}, { objectMode: true }))
       .pipe(writeStreamDB)
       .on('finish', () => {

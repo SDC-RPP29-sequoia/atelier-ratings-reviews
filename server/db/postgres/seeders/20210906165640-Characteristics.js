@@ -107,7 +107,47 @@ module.exports = {
         review_metadata_id: 4,
         createdAt: new Date(),
         updatedAt: new Date()
-      }
+      },
+      { // For adding reviews, product 8, initially rated
+        characteristic_id: 14,
+        name: "Comfort",
+        rating_id: 11,
+        review_metadata_id: 8,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For adding reviews, product 8, initially unrated
+        characteristic_id: 15,
+        name: "Quality",
+        rating_id: null,
+        review_metadata_id: 8,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For reporting reviews
+        characteristic_id: 16,
+        name: "Length",
+        rating_id: 17,
+        review_metadata_id: 9,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For adding reviews, product 12, metadata update
+        characteristic_id: 17,
+        name: "Comfort",
+        rating_id: null,
+        review_metadata_id: 12,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For adding reviews, product 12, metadata update
+        characteristic_id: 18,
+        name: "Quality",
+        rating_id: 16,
+        review_metadata_id: 12,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
     ],
     {},
   ),

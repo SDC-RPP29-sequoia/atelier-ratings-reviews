@@ -11,5 +11,12 @@ class ProductReview {
     this.helpfulness = null;
     this.photos = [];         // { id: 5, url: 'http://foo.bar' }
   }
+
+  addPhoto(idExternal, url) {
+    this.photos.push({
+      id: idExternal,
+      url: url
+    });
+  }
 }
-module.exports.ProductReview = ProductReview;
+module.exports = ProductReview;

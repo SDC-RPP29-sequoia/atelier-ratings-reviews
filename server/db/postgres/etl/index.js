@@ -51,28 +51,30 @@ const run = () => {
       console.log('As a dry run');
     }
     extractor.parseCsvFileToJson(
-      characteristics.filename,
-      characteristics.transformAndLoad,
-      isDryRun)
-    .then(() => console.log(`Completed ETL of ${characteristics.filename}`))
+    //   characteristics.filename,
+    //   characteristics.transformAndLoad,
+    //   isDryRun)
+    // .then(() => console.log(`Completed ETL of ${characteristics.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
     //   reviews.filename,
     //   reviews.transformAndLoad,
-    //   isDryRun))
+    //   isDryRun)//)
     // .then(() => console.log(`Completed ETL of ${reviews.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
+
     //   reviewsToCharacteristics.filename,
     //   reviewsToCharacteristics.transformAndLoad,
-    //   isDryRun))
+    //   isDryRun)//)
     // .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
-    //   reviewsToPhotos.filename,
-    //   reviewsToPhotos.transformAndLoad,
-    //   isDryRun))
-    // .then(() => console.log(`Completed ETL of ${reviewsToPhotos.filename}`))
+
+      reviewsToPhotos.filename,
+      reviewsToPhotos.transformAndLoad,
+      isDryRun)//)
+    .then(() => console.log(`Completed ETL of ${reviewsToPhotos.filename}`))
 
     .catch(error => console.log('Error reading CSV to Postgres database', error))
     // .finally(() => process.exit());

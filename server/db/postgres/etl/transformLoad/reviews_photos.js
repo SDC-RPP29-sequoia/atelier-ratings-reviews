@@ -14,6 +14,25 @@ module.exports = (db, filename = 'reviews_photos.csv') => {
   // }
   const transformAndLoad = (json, lineNumber) => {
     return new Promise((resolve, reject) => {
+      ReviewToPhoto.findOne({ where: {
+        review_id: json.review_id,
+        photo_id: json.id,
+      }})
+      .then(row => {
+        const reviewToPhoto = row?.get();
+        if (reviewToPhoto) {
+          resolve(reviewToPhoto);
+        } else {
+          createReviewsPhotos(json, filename, lineNumber)
+          .then(reviewToPhoto => resolve(reviewToPhoto))
+          .catch(error => reject(error));
+        }
+      })
+    });
+  };
+
+  const createReviewsPhotos = (json, lineNumber) => {
+    return new Promise((resolve, reject) => {
       // TODO: Repeated code from characteristic_reviews. Maybe factor this out?
       const reviewIdExternal = parseInt(json.review_id);
       const getReviewId = new Promise((resolve, reject) => {
@@ -21,7 +40,7 @@ module.exports = (db, filename = 'reviews_photos.csv') => {
         .then(review => {
           const reviewId = review.id;
           if (reviewId) {
-            console.log('Review.findOne: ', reviewId);
+            // console.log('Review.findOne: ', reviewId);
             resolve(reviewId);
           } else {
             console.log(`Review.findOne failed to find review for external ID ${reviewIdExternal}`, error);
@@ -50,9 +69,9 @@ module.exports = (db, filename = 'reviews_photos.csv') => {
             console.log('Failed to create photo for external ID: ', photoIdExternal);
             reject();
           } else if (created) {
-            console.log('Added photo: ', photo.id)
+            // console.log('Added photo: ', photo.id)
           } else {
-            console.log('Found existing photo: ', photo.id)
+            // console.log('Found existing photo: ', photo.id)
           }
           resolve(photo.id);
         })
@@ -65,9 +84,9 @@ module.exports = (db, filename = 'reviews_photos.csv') => {
       Promise.all([getReviewId, getPhotoId])
       .then(ids => {
         const reviewId = ids[0];
-        console.log('reviewId: ', reviewId);
+        // console.log('reviewId: ', reviewId);
         const photoId = ids[1];
-        console.log('photoId: ', photoId);
+        // console.log('photoId: ', photoId);
 
         const association = {
           review_id: reviewId,
@@ -80,7 +99,7 @@ module.exports = (db, filename = 'reviews_photos.csv') => {
         })
         .then(result => {
           const reviewToPhoto = result[0].get();
-          console.log('ReviewToPhoto.findOrCreate: ', reviewToPhoto);
+          // console.log('ReviewToPhoto.findOrCreate: ', reviewToPhoto);
           resolve(reviewToPhoto);
         })
         .catch(error => {

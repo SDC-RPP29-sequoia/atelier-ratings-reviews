@@ -14,7 +14,7 @@ module.exports = {
       {
         review_id: 1,
         characteristic_id: 3,
-        rating: 1,
+        rating: 5,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -127,6 +127,27 @@ module.exports = {
         review_id: 10,
         characteristic_id: 13,
         rating: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For reporting reviews
+        review_id: 11,
+        characteristic_id: 16,
+        rating: 5,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For reporting reviews
+        review_id: 13,
+        characteristic_id: 16,
+        rating: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      { // For reporting reviews
+        review_id: 14,
+        characteristic_id: 16,
+        rating: 4,
         createdAt: new Date(),
         updatedAt: new Date()
       },

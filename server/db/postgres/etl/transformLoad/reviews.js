@@ -24,9 +24,25 @@ module.exports = (db, filename = 'reviews.csv') => {
   //   helpfulness: '2'
   // }
   const transformAndLoad = (json, lineNumber) => {
+      return new Promise((resolve, reject) => {
+        Review.findOne({ where: { review_id: json.id } })
+        .then(row => {
+          const review = row?.get();
+          if (review) {
+            resolve(review);
+          } else {
+            createReview(json, filename, lineNumber)
+            .then(review => resolve(review))
+            .catch(error => reject(error));
+          }
+        })
+      });
+  };
+
+  const createReview = (json, lineNumber) => {
     return new Promise((resolve, reject) => {
       const getProfileId = new Promise((resolve, reject) => {
-        console.log('getProfileId:', json.reviewer_name);
+        // console.log('getProfileId:', json.reviewer_name);
         Profile.findOrCreate({
           where: { username: json.reviewer_name },
           defaults: {
@@ -37,7 +53,7 @@ module.exports = (db, filename = 'reviews.csv') => {
         .then(rows => {
           const profile = rows[0]?.get();
           if (profile) {
-            console.log('Added profile: ', profile.id);
+            // console.log('Added profile: ', profile.id);
             resolve(profile.id);
           } else {
             console.log('Failed to add profile for username: ', json.reviewer_name);
@@ -53,7 +69,7 @@ module.exports = (db, filename = 'reviews.csv') => {
 
       const getProductId = new Promise((resolve, reject) => {
         const productId = json.product_id;
-        console.log('getProductId:', productId);
+        // console.log('getProductId:', productId);
 
         Product.findOrCreate({
           where: { product_id: productId },
@@ -68,7 +84,7 @@ module.exports = (db, filename = 'reviews.csv') => {
               defaults: { product_id: product.id }
             })
             .then(() => {
-              console.log('Created product & metadata for product external ID: ', product.id);
+              // console.log('Created product & metadata for product external ID: ', product.id);
               resolve(product.id);
             })
             .catch(error => {
@@ -76,7 +92,7 @@ module.exports = (db, filename = 'reviews.csv') => {
               reject(error);
             });
           } else {
-            console.log('Found product for external ID: ', product.id);
+            // console.log('Found product for external ID: ', product.id);
             resolve(product.id);
           }
         })
@@ -91,8 +107,8 @@ module.exports = (db, filename = 'reviews.csv') => {
         const profileId = ids[0];
         const productId = ids[1];
         const createdAt = new Date(parseInt(json.date));
-        console.log('Creating review for ');
-        console.log('Product ID: ', productId);
+        // console.log('Creating review for ');
+        // console.log('Product ID: ', productId);
 
         const reviewIdExternal = parseInt(json.id);
         const rating = parseInt(json.rating);
@@ -124,9 +140,9 @@ module.exports = (db, filename = 'reviews.csv') => {
             console.log('Failed to create review for external ID: ', reviewIdExternal);
             reject();
           } else if (created) {
-            console.log('Added review: ', review.id)
+            // console.log('Added review: ', review.id);
           } else {
-            console.log('Found existing review: ', review.id)
+            // console.log('Found existing review: ', review.id);
           }
           resolve(review);
         })
@@ -135,7 +151,7 @@ module.exports = (db, filename = 'reviews.csv') => {
         console.log(`Failed to get supporting IDs and add review ${json.id} for line # ${lineNumber}`, error);
         reject(error);
       });
-    })
+    });
   };
 
   return {
