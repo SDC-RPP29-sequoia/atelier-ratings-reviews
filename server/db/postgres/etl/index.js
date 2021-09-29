@@ -51,30 +51,32 @@ const run = () => {
       console.log('As a dry run');
     }
     extractor.parseCsvFileToJson(
+    //  // 3,347,678 entries - 185 MB - 3,347,679 entries added
     //   characteristics.filename,
     //   characteristics.transformAndLoad,
     //   isDryRun)
     // .then(() => console.log(`Completed ETL of ${characteristics.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
+    //  // 5,774,952 entries - 2.87 GB - 5,765,293 entries added, short 10k
     //   reviews.filename,
     //   reviews.transformAndLoad,
     //   isDryRun)//)
     // .then(() => console.log(`Completed ETL of ${reviews.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
-
-    //   reviewsToCharacteristics.filename,
-    //   reviewsToCharacteristics.transformAndLoad,
-    //   isDryRun)//)
-    // .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.filename}`))
+    // // 19,327,575 entries - 1.58 GB - 1,570,611 entries added (in progress & re-run first 2 mil)
+      reviewsToCharacteristics.filename,
+      reviewsToCharacteristics.transformAndLoad,
+      isDryRun)//)
+    .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
-
-      reviewsToPhotos.filename,
-      reviewsToPhotos.transformAndLoad,
-      isDryRun)//)
-    .then(() => console.log(`Completed ETL of ${reviewsToPhotos.filename}`))
+    // // 2,742,540 entries - 476 MB - 1,396,917 entries added (in progress & re-run first 2 mil, then last mil)
+    //   reviewsToPhotos.filename,
+    //   reviewsToPhotos.transformAndLoad,
+    //   isDryRun)//)
+    // .then(() => console.log(`Completed ETL of ${reviewsToPhotos.filename}`))
 
     .catch(error => console.log('Error reading CSV to Postgres database', error))
     // .finally(() => process.exit());

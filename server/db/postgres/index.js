@@ -7,7 +7,7 @@ const { seedDatabase } = require('./seed.js');
 module.exports = (envOrConfigIn) => {
   // Establish config file for connection
   // TODO: The next two lines can maybe be factored out & shared from elsewhere?
-  const envOrConfig = envOrConfigIn || process.env.NODE_ENV || 'development';
+  const envOrConfig = envOrConfigIn || process.env.NODE_ENV || 'test'; //'development';
   const getConfig = (envOrconfig) => {
     if (typeof envOrconfig === 'object') {
       return envOrconfig;

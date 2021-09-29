@@ -16,7 +16,7 @@ const getFilePath = (filename, dryRun) => {
 }
 // 19,327,575 entries - characteristics to reviews
 // 2,742,540 entries - photos to reviews
-const lineNumberMultiple = 0;
+const lineNumberMultiple = 2;
 module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000, maxCollectionRun = 100) => {
   return new Promise((resolve, reject) => {
     const filePath = getFilePath(filename, dryRun);
