@@ -144,8 +144,7 @@ module.exports = {
   // ],
 
   // The test environment that will be used for testing
-  testEnvironment: 'jsdom', //'enzyme', //'jsdom',
-
+  testEnvironment: 'node', //'enzyme', //'jsdom', //'node
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
 
@@ -161,6 +160,9 @@ module.exports = {
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
+    '<rootDir>/compiled/',
+    '<rootDir>/data/',
+    '<rootDir>/deployment/',
     '<rootDir>/docs/',
   ],
 
@@ -177,7 +179,8 @@ module.exports = {
   // testURL: "http://localhost",
 
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
-  // timers: "real",
+  timers: "fake", // "real"
+  testTimeout: 30000,
 
   // A map from regular expressions to paths to transformers
   // transform: undefined,

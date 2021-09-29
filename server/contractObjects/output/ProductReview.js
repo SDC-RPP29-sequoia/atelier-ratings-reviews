@@ -9,7 +9,14 @@ class ProductReview {
     this.response = null;
     this.date = null;
     this.helpfulness = null;
-    this.photos = [];
+    this.photos = [];         // { id: 5, url: 'http://foo.bar' }
+  }
+
+  addPhoto(idExternal, url) {
+    this.photos.push({
+      id: idExternal,
+      url: url
+    });
   }
 }
-module.exports.ProductReview = ProductReview;
+module.exports = ProductReview;

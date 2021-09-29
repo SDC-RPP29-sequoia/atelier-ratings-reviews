@@ -19,7 +19,6 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       summary: {
-        allowNull: false,
         type: Sequelize.STRING
       },
       recommend:{

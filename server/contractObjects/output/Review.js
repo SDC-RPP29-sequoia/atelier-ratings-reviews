@@ -10,8 +10,8 @@ class Review {
     this.response = null;
     this.date = null;
     this.helpfulness = null;
-    this.photos = [];
-    this.characteristics = [];
+    this.photos = [];           // { id: 5, url: 'http://foo.bar' }
+    this.characteristics = {};  // { fit: { id: 5, value: 4.3 }}
   }
 
   addCharacteristic(idExternal, name, rating) {
@@ -20,5 +20,12 @@ class Review {
       value: rating
     }
   }
+
+  addPhoto(idExternal, url) {
+    this.photos.push({
+      id: idExternal,
+      url: url
+    });
+  }
 }
-module.exports.Review = Review;
+module.exports = Review;

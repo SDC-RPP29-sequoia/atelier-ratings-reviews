@@ -21,8 +21,5 @@ class ProductReviewsRequest {
     }
     this.sortBy = sortBy;
   }
-
-
-  const
 }
-module.exports.ProductReviewsRequest = ProductReviewsRequest;
+module.exports = ProductReviewsRequest;
