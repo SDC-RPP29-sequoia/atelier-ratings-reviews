@@ -60,21 +60,22 @@ module.exports = (envOrConfigIn) => {
 
   const resetDatabase = (callback) => {
     return new Promise((resolve, reject) => {
-      if (envOrConfig === 'test') {
-        console.log('Resetting Postgres database');
-        seedDatabase()
-        .then (() => {
-          console.log('Postgres database reset & re-seeded');
-          callback && callback();
-          resolve(true);
-        })
-        .catch (error => {
-          console.log('Unable to reset Postgres database', error);
-          reject(error);
-        });
-      } else {
-        resolve(false);
-      }
+      resolve(true);
+      // if (envOrConfig === 'test') {
+      //   console.log('Resetting Postgres database');
+      //   seedDatabase()
+      //   .then (() => {
+      //     console.log('Postgres database reset & re-seeded');
+      //     callback && callback();
+      //     resolve(true);
+      //   })
+      //   .catch (error => {
+      //     console.log('Unable to reset Postgres database', error);
+      //     reject(error);
+      //   });
+      // } else {
+      //   resolve(false);
+      // }
     })
   }
 
@@ -96,14 +97,14 @@ module.exports = (envOrConfigIn) => {
       })
       .then(() => {
         if (isDatabaseReset) {
-          callback();
+          callback && callback();
           resolve();
         } else {
           console.log('Syncing Postgres database')
           sequelize.sync() // This creates the table for any model if it doesn't exist (and does nothing if it already exists)
           .then (() => {
             console.log('Sync completed');
-            callback();
+            callback && callback();
             resolve();
           })
           .catch(error => {
@@ -121,6 +122,7 @@ module.exports = (envOrConfigIn) => {
 
   return (callback) => {
     return new Promise((resolve, reject) => {
+      console.log('Postgres initialization');
       initializeDatabase(callback)
       .catch(error => {
         console.log('Error in initializing Postgres database!!!', error);

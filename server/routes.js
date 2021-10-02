@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const dbModel = require('./db/model');
+const dbModel = require('./db/model')();
 
 const db = dbModel.methods;
 
@@ -19,7 +19,7 @@ router.get('/reviews/',
     const productId = req.query.product_id;
     const page = req.query.page ? req.query.page : 1; // Selects the page of results to return
     const count = req.query.count ? req.query.count : 5; // Specifies how many results per page to return.
-    const sort = req.query.sort; // Changes the sort order of reviews to be based on "newest", "helpful", or "relevant"
+    const sort = req.query.sort ? req.query.sort : ''; // Changes the sort order of reviews to be based on "newest", "helpful", or "relevant"
 
     if (!productId) {
       res.status('400').send('Product ID missing.');

@@ -281,6 +281,7 @@ module.exports = (db) => {
   // TBD: Table join for reviewer name, characteristics (joined to rating), photos
   const getReview = (reviewIdFilter, getCharacteristics = true) => {
     return new Promise( (resolve, reject) => {
+      console.log('getReview promise');
       let review;
       Review.findOne({ where: reviewIdFilter })
       .then(row => {
@@ -288,6 +289,7 @@ module.exports = (db) => {
           console.log('Review not found!', reviewIdFilter);
           resolve();
         } else {
+          console.log('Row: ', row);
           review = row.get();
           if (review.reported) {
             console.log('Review has been reported and will not be returned');
@@ -318,6 +320,7 @@ module.exports = (db) => {
               }
             })
             .then(() => {
+              console.log('review: ', review);
               resolve(adaptor.reviewToOutput(review));
             })
           }

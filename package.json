@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "API service for handling the 'Ratings and Reviews' module of the Atelier shopping app.",
   "scripts": {
+    "seed": "export NODE_ENV='test' & node ./server/db/postgres/seed.js -r",
     "test": "export NODE_ENV='test' & jest --coverage --testResultsProcessor=jest-sonar-reporter",
     "test-controller": "export NODE_ENV='test' & jest --coverage --testPathPattern=server/db/model --testResultsProcessor=jest-sonar-reporter",
-    "test-routes": "export NODE_ENV='test' & jest --coverage --testPathPattern=server/tests  --testResultsProcessor=jest-sonar-reporter",
+    "test-routes": "export NODE_ENV='test' & jest --coverage --runTestsByPath tests/index.test.js  --testResultsProcessor=jest-sonar-reporter",
     "test-init": "jest --init",
+    "test-controller-custom": "node server/db/model/tests/index.customTest.js",
     "coveralls": "export NODE_ENV='test' & jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
     "start": "nodemon --ignore node_modules server",
     "start-dev": "export NODE_ENV='development' & nodemon --ignore node_modules server",
@@ -51,7 +53,8 @@
     "jest": "^27.0.6",
     "jest-cli": "^27.0.6",
     "jest-sonar-reporter": "^2.0.0",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.6"
   },
   "dependencies": {
     "bluebird": "^3.3.4",

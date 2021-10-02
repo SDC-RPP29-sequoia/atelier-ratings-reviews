@@ -144,7 +144,7 @@ module.exports = {
   // ],
 
   // The test environment that will be used for testing
-  testEnvironment: 'node', //'enzyme', //'jsdom', //'node
+  testEnvironment: 'jsdom', //'enzyme', //'jsdom', //'node
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
 
@@ -179,7 +179,7 @@ module.exports = {
   // testURL: "http://localhost",
 
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
-  timers: "fake", // "real"
+  timers: "fake", // "real"s
   testTimeout: 30000,
 
   // A map from regular expressions to paths to transformers

@@ -19,8 +19,17 @@ const seedDatabase = () => {
         reject(error);
       });
     } else {
+      console.log('Environment is: ', process.env.NODE_ENV);
       resolve();
     }
   });
 };
+
+if (process.argv[2] === '-r') {
+  if (process.env.NODE_ENV === undefined) {
+    process.env.NODE_ENV = 'test';
+  }
+  seedDatabase();
+}
+
 module.exports.seedDatabase = seedDatabase;

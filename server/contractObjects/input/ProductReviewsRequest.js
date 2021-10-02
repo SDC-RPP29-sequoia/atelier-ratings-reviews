@@ -5,7 +5,7 @@ class ProductReviewsRequest {
     relevant: 'relevant'
   };
 
-  constructor(productId, page = 1, count = 5, sortBy) {
+  constructor(productId, page = 1, count = 5, sortBy = '') {
     this.product_id = productId;
     this.page = page;
     this.count = count;

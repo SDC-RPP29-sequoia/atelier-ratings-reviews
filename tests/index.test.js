@@ -1,4 +1,16 @@
-import app from '../server/index.js';
+// import app from '../server/index.js';
+// import dbModel from '../index.js';
+// const app = require('../server/index.js');
+const app = require('../server/app.js');
+const request = require('supertest');
+const { seedDatabase } = require('../server/db/postgres/seed.js');
+
+const postgres = require('../server/db/postgres')(); // Can add env/config variable here
+const port = 3000;
+
+// const dbInit = dbModel('test');
+let postgresDB;
+// let db;
 
 // ==== Test Template ====
 // For Jest usage, see: https://jestjs.io/docs/getting-started
@@ -6,24 +18,35 @@ import app from '../server/index.js';
 describe('Server Routes tests', function () {
   beforeAll(() => {
     return new Promise((resolve, reject) => {
-      dbInit.secondary(() => console.log('Postgres is ready for testing from the controller!'))
+      seedDatabase()
       .then(() => {
-        // postgresDB = postgres;
-        // db = postgresDB.methods;
+        console.log('Postgres database seeded.');
+        console.log('Connecting to Postgres database...');
+        return postgres(() => { console.log('Postgres DB started'); })
+      })
+      .then(postgresConnection => {
+        postgresDB = postgresConnection;
+        app.listen(port, () => {
+          console.log(`NSA is listening in at http://localhost:${port}`);
+        })
+      })
+      .catch(error => {
+        console.log('Error in making database connections', error);
+      })
+      .then(() => {
         console.log('Ready for testing!');
         resolve();
       })
       .catch(error => {
-        console.log('Postgres had an error initializing from the controller', error);
+        console.log('Postgres had an error seeding', error);
         reject(error);
       });
     });
-
   });
 
   afterAll(() => {
     return new Promise((resolve, reject) => {
-      dbInit.secondary.closeDatabase()
+      postgresDB.closeDatabase()
       .then(() => {
         console.log('Postgres connection has closed in the controller');
         resolve();
@@ -245,52 +268,61 @@ describe('Server Routes tests', function () {
   // ===== Read Methods =====
   // Has no reviews (3)
   // Contains reported review, review with photos, review with characteristics ratings (4)
-  describe('getProductReviews', function () {
-  //   it('Returns an array of reviews associated with a product by product public id', done => {
-  //       let productReviewsExpected = {
-  //         product: 1,
-  //         page: 1,
-  //         count: 5,
-  //         results: [
-  //           {
-  //             review_id: 1,
-  //             reviewer_name: 'funtime',
-  //             rating: 5,
-  //             summary: 'This product was great!',
-  //             recommend: true,
-  //             response: null,
-  //             body: 'I really did or did not like this product based on whether it was sustainably sourced.  Then I found out that its made from nothing at all.',
-  //             date: new Date(1596080481467),
-  //             helpfulness: 8
-  //           },
-  //           {
-  //             review_id: 2,
-  //             reviewer_name: 'mymainstreammother',
-  //             rating: 4,
-  //             summary: 'This product was ok!',
-  //             recommend: false,
-  //             response: null,
-  //             body: 'I really did not like this product solely because I am tiny and do not fit into it.',
-  //             date: new Date(1610178433963),
-  //             helpfulness: 2
-  //           }
-  //         ]
-  //       };
+  describe('GET - getProductReviews', function () {
+    it ('Returns 404 if no product ID is given', done => {
+      request(app).get(`/reviews`)
+      .then(body => {
+        expect(body.status).toEqual(400);
+        done();
+      })
+      .catch(error => done(error));
+    });
 
-  //       let productReviewRequest = {
-  //         productId: productReviewsExpected.product,
-  //         page: productReviewsExpected.page,
-  //         count: productReviewsExpected.count,
-  //         sortBy: 'newest' };
+    it('Returns an array of reviews associated with a product by product public id', done => {
+        let productReviewsExpected = {
+          product: 1,
+          page: 1,
+          count: 5,
+          results: [
+            {
+              review_id: 1,
+              reviewer_name: 'funtime',
+              rating: 5,
+              summary: 'This product was great!',
+              recommend: true,
+              response: null,
+              body: 'I really did or did not like this product based on whether it was sustainably sourced.  Then I found out that its made from nothing at all.',
+              date: new Date(1596080481467),
+              helpfulness: 8
+            },
+            {
+              review_id: 2,
+              reviewer_name: 'mymainstreammother',
+              rating: 4,
+              summary: 'This product was ok!',
+              recommend: false,
+              response: null,
+              body: 'I really did not like this product solely because I am tiny and do not fit into it.',
+              date: new Date(1610178433963),
+              helpfulness: 2
+            }
+          ]
+        };
 
-  //       db.getProductReviews(productReviewRequest)
-  //       .then(productReviews => {
-  //         expect(productReviews).toBeDefined();
-  //         expect(productReviews).toEqual(expect.objectContaining(productReviewsExpected));
-  //         done();
-  //       })
-  //       .catch(error => done(error));
-  //   });
+        // let productReviewRequest = {
+        //   productId: productReviewsExpected.product,
+        //   page: productReviewsExpected.page,
+        //   count: productReviewsExpected.count,
+        //   sortBy: 'newest' };
+// done();
+
+      request(app).get(`/reviews?product_id=${productReviewsExpected.product}`)
+      .then(body => {
+        expect(body).toEqual(expect.objectContaining(productReviewsExpected));
+        done();
+      })
+      .catch(error => done(error));
+    });
 
   // //   // TBD
   // //   it('Returns an array of reviews, with some existing reviews with photo data for a review with photos', done => {
@@ -718,137 +750,137 @@ describe('Server Routes tests', function () {
   // //   });
   });
 
-  // TBD: Table join for reviewer name, characteristics, photos
-  describe('getReview', function () {
-    it('Returns an existing review by public review ID', done => {
-      let reviewExpected = {
-        review_id: 2,
-        product_id: 1,
-        reviewer_name: 'mymainstreammother',
-        rating: 4,
-        summary: 'This product was ok!',
-        recommend: false,
-        response: null,
-        body: 'I really did not like this product solely because I am tiny and do not fit into it.',
-        date: new Date(1610178433963),
-        helpfulness: 2
-      };
+  // // TBD: No routes set up yet
+  // describe('GET - getReview', function () {
+  //   it('Returns an existing review by public review ID', done => {
+  //     let reviewExpected = {
+  //       review_id: 2,
+  //       product_id: 1,
+  //       reviewer_name: 'mymainstreammother',
+  //       rating: 4,
+  //       summary: 'This product was ok!',
+  //       recommend: false,
+  //       response: null,
+  //       body: 'I really did not like this product solely because I am tiny and do not fit into it.',
+  //       date: new Date(1610178433963),
+  //       helpfulness: 2
+  //     };
 
-      db.getReview(reviewExpected.review_id).then(review => {
-        expect(review).toBeDefined();
-        expect(review).toEqual(expect.objectContaining(reviewExpected));
-        done();
-      })
-      .catch(error => done(error));
-    });
+  //     db.getReview(reviewExpected.review_id).then(review => {
+  //       expect(review).toBeDefined();
+  //       expect(review).toEqual(expect.objectContaining(reviewExpected));
+  //       done();
+  //     })
+  //     .catch(error => done(error));
+  //   });
 
-    it('Returns a review with response message if present', done => {
-      let reviewExpected = {
-        review_id: 3,
-        product_id: 2,
-        reviewer_name: 'bigbrotherbenjamin',
-        rating: 4,
-        summary: 'I am liking these glasses',
-        recommend: true,
-        response: 'Glad you\'re enjoying the product!',
-        body: 'They are very dark.  But that\'s good because I\'m in very sunny spots',
-        date: new Date(1609325851021),
-        helpfulness: 5,
-      };
+  //   // it('Returns a review with response message if present', done => {
+  //   //   let reviewExpected = {
+  //   //     review_id: 3,
+  //   //     product_id: 2,
+  //   //     reviewer_name: 'bigbrotherbenjamin',
+  //   //     rating: 4,
+  //   //     summary: 'I am liking these glasses',
+  //   //     recommend: true,
+  //   //     response: 'Glad you\'re enjoying the product!',
+  //   //     body: 'They are very dark.  But that\'s good because I\'m in very sunny spots',
+  //   //     date: new Date(1609325851021),
+  //   //     helpfulness: 5,
+  //   //   };
 
-      db.getReview(reviewExpected.review_id).then(review => {
-        expect(review).toBeDefined();
-        expect(review).toEqual(expect.objectContaining(reviewExpected));
-        done();
-      })
-      .catch(error => done(error));
-    });
+  //   //   db.getReview(reviewExpected.review_id).then(review => {
+  //   //     expect(review).toBeDefined();
+  //   //     expect(review).toEqual(expect.objectContaining(reviewExpected));
+  //   //     done();
+  //   //   })
+  //   //   .catch(error => done(error));
+  //   // });
 
-    it('Returns an existing review with photo data for a review with photos', done => {
-      let reviewExpected = {
-        review_id: 5,
-        product_id: 2,
-        reviewer_name: 'shortandsweeet',
-        rating: 3,
-        summary: 'I\'m enjoying wearing these shades',
-        recommend: true,
-        response: null,
-        body: 'Comfortable and practical.',
-        date: new Date(1615987717620),
-        helpfulness: 5,
-        photos: [
-          {
-            id: 1,
-            url: 'https://images.unsplash.com/photo-1560570803-7474c0f9af99?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=975&q=80'
-          },
-          {
-            id: 2,
-            url: 'https://images.unsplash.com/photo-1561693532-9ff59442a7db?ixlib=rb-1.2.1&auto=format&fit=crop&w=975&q=80'
-          },
-          {
-            id: 3,
-            url: 'https://images.unsplash.com/photo-1487349384428-12b47aca925e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80'
-          },
-        ]
-      };
+  //   // it('Returns an existing review with photo data for a review with photos', done => {
+  //   //   let reviewExpected = {
+  //   //     review_id: 5,
+  //   //     product_id: 2,
+  //   //     reviewer_name: 'shortandsweeet',
+  //   //     rating: 3,
+  //   //     summary: 'I\'m enjoying wearing these shades',
+  //   //     recommend: true,
+  //   //     response: null,
+  //   //     body: 'Comfortable and practical.',
+  //   //     date: new Date(1615987717620),
+  //   //     helpfulness: 5,
+  //   //     photos: [
+  //   //       {
+  //   //         id: 1,
+  //   //         url: 'https://images.unsplash.com/photo-1560570803-7474c0f9af99?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=975&q=80'
+  //   //       },
+  //   //       {
+  //   //         id: 2,
+  //   //         url: 'https://images.unsplash.com/photo-1561693532-9ff59442a7db?ixlib=rb-1.2.1&auto=format&fit=crop&w=975&q=80'
+  //   //       },
+  //   //       {
+  //   //         id: 3,
+  //   //         url: 'https://images.unsplash.com/photo-1487349384428-12b47aca925e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80'
+  //   //       },
+  //   //     ]
+  //   //   };
 
-      db.getReview(reviewExpected.review_id).then(review => {
-        expect(review).toBeDefined();
-        expect(review).toEqual(expect.objectContaining(reviewExpected));
-        done();
-      })
-      .catch(error => done(error));
-    });
+  //   //   db.getReview(reviewExpected.review_id).then(review => {
+  //   //     expect(review).toBeDefined();
+  //   //     expect(review).toEqual(expect.objectContaining(reviewExpected));
+  //   //     done();
+  //   //   })
+  //   //   .catch(error => done(error));
+  //   // });
 
-    it('Returns an existing review with characteristics data for a review with characteristic ratings', done => {
-      let reviewExpected = {
-        review_id: 2,
-        product_id: 1,
-        reviewer_name: 'mymainstreammother',
-        rating: 4,
-        summary: 'This product was ok!',
-        recommend: false,
-        response: null,
-        body: 'I really did not like this product solely because I am tiny and do not fit into it.',
-        date: new Date(1610178433963),
-        helpfulness: 2,
-        characteristics: {
-          'Length': {
-            id: 2,
-            value: 4
-          }
-        }
-      };
+  //   // it('Returns an existing review with characteristics data for a review with characteristic ratings', done => {
+  //   //   let reviewExpected = {
+  //   //     review_id: 2,
+  //   //     product_id: 1,
+  //   //     reviewer_name: 'mymainstreammother',
+  //   //     rating: 4,
+  //   //     summary: 'This product was ok!',
+  //   //     recommend: false,
+  //   //     response: null,
+  //   //     body: 'I really did not like this product solely because I am tiny and do not fit into it.',
+  //   //     date: new Date(1610178433963),
+  //   //     helpfulness: 2,
+  //   //     characteristics: {
+  //   //       'Length': {
+  //   //         id: 2,
+  //   //         value: 4
+  //   //       }
+  //   //     }
+  //   //   };
 
-      db.getReview(reviewExpected.review_id).then(review => {
-        expect(review).toBeDefined();
-        expect(review).toEqual(expect.objectContaining(reviewExpected));
-        done();
-      })
-      .catch(error => done(error));
-    });
+  //   //   db.getReview(reviewExpected.review_id).then(review => {
+  //   //     expect(review).toBeDefined();
+  //   //     expect(review).toEqual(expect.objectContaining(reviewExpected));
+  //   //     done();
+  //   //   })
+  //   //   .catch(error => done(error));
+  //   // });
 
-    it('Returns undefined if failing to find a review', done => {
-      db.getReview(-1)
-      .then(review => {
-        expect(review).toBeUndefined();
-        done();
-      })
-      .catch(error => done(error));
-    });
+  //   // it('Returns undefined if failing to find a review', done => {
+  //   //   db.getReview(-1)
+  //   //   .then(review => {
+  //   //     expect(review).toBeUndefined();
+  //   //     done();
+  //   //   })
+  //   //   .catch(error => done(error));
+  //   // });
 
-    it('Returns undefined for existing review if review is reported', done => {
-      db.getReview(9)
-      .then(review => {
-        expect(review).toBeUndefined();
-        done();
-      })
-      .catch(error => done(error));
-    });
-  });
+  //   // it('Returns undefined for existing review if review is reported', done => {
+  //   //   db.getReview(9)
+  //   //   .then(review => {
+  //   //     expect(review).toBeUndefined();
+  //   //     done();
+  //   //   })
+  //   //   .catch(error => done(error));
+  //   // });
+  // });
 
   // TBD: Table join for rating_id & recommended_id
-  describe('getReviewMetadata', function () {
+  describe('GET - getReviewMetadata', function () {
     // it('Returns metadata for the reviews of an existing product by public product ID', done => {
     //   let metadataExpected = {
     //     product_id: 10,

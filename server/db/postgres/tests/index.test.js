@@ -1,4 +1,3 @@
-
 import postgres from '../index.js';
 
 const postgresInit = postgres('test');
@@ -10,9 +9,7 @@ let db;
 // For Jest usage, see: https://jestjs.io/docs/getting-started
 describe('postgres tests', function () {
   beforeAll(() => {
-    // jest.setTimeout(20 * 1000);
     return new Promise((resolve, reject) => {
-      // jest.setTimeout(20 * 1000);
       postgresInit(() => console.log('Postgres is ready for testing!'))
       .then((postgres) => {
         postgresDB = postgres;
@@ -29,15 +26,20 @@ describe('postgres tests', function () {
 
   afterAll(() => {
     return new Promise((resolve, reject) => {
-      postgresDB.closeDatabase()
-      .then(() => {
-        console.log('Postgres connection has closed');
-        resolve();
-      })
-      .catch(error => {
-        console.log('Postgres had an error closing', error);
-        reject(error);
-      });
+      if (postgresDB) {
+        postgresDB.closeDatabase()
+        .then(() => {
+          console.log('Postgres connection has closed');
+          resolve();
+        })
+        .catch(error => {
+          console.log('Postgres had an error closing', error);
+          reject(error);
+        });
+      } else {
+        console.log('No instance of postgres exists to close!');
+        reject();
+      }
     })
   });
 
