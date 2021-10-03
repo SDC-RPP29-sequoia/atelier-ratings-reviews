@@ -11,6 +11,8 @@
     "test-controller-custom": "node server/db/model/tests/index.customTest.js",
     "coveralls": "export NODE_ENV='test' & jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
     "start": "nodemon --ignore node_modules server",
+    "start-test": "export NODE_ENV='test' & node server/index.js",
+    "start-seed": "export NODE_ENV='test' & node server/db/postgres/seed.js -r",
     "start-dev": "export NODE_ENV='development' & nodemon --ignore node_modules server",
     "start-prod": "export NODE_ENV='production' & nodemon --ignore node_modules server",
     "mongo-start": "brew services start mongodb-community@4.4",

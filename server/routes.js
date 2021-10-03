@@ -1,122 +1,214 @@
 const router = require('express').Router();
-const dbModel = require('./db/model')();
 
-const db = dbModel.methods;
+// ==== start ========= from ./model/adaptor.js
+const ReviewInput = require('./contractObjects/input/ReviewInput.js');
+const ProductReviewsRequest = require('./contractObjects/input/ProductReviewsRequest.js');
+// Below is just putting the contents of the adaptor module & import into an object literal here
+const adaptor = {
+  reviewFromServerToDatabase: (reviewServer) => {
+    const review = new ReviewInput(reviewServer);
+    review.addCharacteristics(reviewServer.characteristics);
 
-// Authentication
-// To use this API, you must create a GitHub API Token and attach it in every request as an "Authorization" header.
+    return review;
+  },
+  productReviewsRequestFromServerToDatabase: (productId, page, count, sortBy) => {
+    return new ProductReviewsRequest(productId, page, count, sortBy);
+  }
+}
+// ==== end ========= from ./model/adaptor.js
 
-// https://learn-2.galvanize.com/cohorts/2592/blocks/94/content_files/Front%20End%20Capstone/project-atelier/reviews.md
+// const dbModel = require('./db/model')();
+const dbSecondaryInit = require('./db/postgres')()
+dbSecondaryInit(() => console.log('Database loaded!'))
+.then (dbModel => {
+  const db = dbModel.methods;
+  console.log('Environment: ', process.env.NODE_ENV);
+  console.log('db:', db);
 
-// ===== FOR ALL METHODS =====
-// 1. Puts together input contract object needed for db controller based on URL params/query. Other data left raw.
-// 2. Makes DB request
-// 3. Recieves DB request in output contract object and sends it back
+  // Authentication
+  // To use this API, you must create a GitHub API Token and attach it in every request as an "Authorization" header.
 
-// Returns a list of reviews for a particular product. This list does not include any reported reviews.
-router.get('/reviews/',
-  (req, res) => {
-    const productId = req.query.product_id;
-    const page = req.query.page ? req.query.page : 1; // Selects the page of results to return
-    const count = req.query.count ? req.query.count : 5; // Specifies how many results per page to return.
-    const sort = req.query.sort ? req.query.sort : ''; // Changes the sort order of reviews to be based on "newest", "helpful", or "relevant"
+  // https://learn-2.galvanize.com/cohorts/2592/blocks/94/content_files/Front%20End%20Capstone/project-atelier/reviews.md
 
-    if (!productId) {
-      res.status('400').send('Product ID missing.');
-    } else {
-      db.getProductReviews(productId, page, count, sort)
-      .then(results => {
-        const productReviews = {
-          product: productId,
-          page: page,
-          count: count,
-          results: results
-        };
+  // ===== FOR ALL METHODS =====
+  // 1. Puts together input contract object needed for db controller based on URL params/query. Other data left raw.
+  // 2. Makes DB request
+  // 3. Recieves DB request in output contract object and sends it back
 
-        res.status('200').send(productReviews);
-      })
-      .catch(error => {
-        console.log('Server error', error);
-        res.status('500').send(error);
-      });
-    }
-  });
+  // Returns a list of reviews for a particular product. This list does not include any reported reviews.
+  router.get('/reviews/',
+    (req, res) => {
+      const productId = req.query.product_id;
+      const page = req.query.page ? req.query.page : 0; // Selects the page of results to return
+      const count = req.query.count ? req.query.count : 5; // Specifies how many results per page to return.
+      const sortBy = req.query.sort ? req.query.sort : ''; // Changes the sort order of reviews to be based on "newest", "helpful", or "relevant"
 
-// Returns review metadata for a given product.
-router.get('/reviews/meta',
-  (req, res) => {
-    const reviewId = req.query.review_id;
+      if (productId) {
+        const productReviewRequest = adaptor.productReviewsRequestFromServerToDatabase(productId, page, count, sortBy);
+        console.log('productReviewRequest: ', productReviewRequest);
+        let filter = undefined; // TODO sort this out, including location of definition
 
-    if (!reviewId) {
-      res.status('400').send('Review ID missing.');
-    } else {
-      db.getReviewMetadata(reviewId)
-      .then(result => res.status('200').send(result))
-      .catch(error => {
-        console.log('Server error', error);
-        res.status('500').send(error);
-      });
-    }
-  });
-
-// Adds a review for the given product.
-router.post('/reviews',
-  (req, res) => {
-
-    let review = req.body;
-
-    // Validate required data
-    if (!review) {
-      res.status('400').send('Review data is missing.');
-    } else if (!review.name) {
-      res.status('400').send('Reviewer name is missing.');
-    } else if (!review.email) {
-      res.status('400').send('Reviewer email is missing.');
-    } else if (review.rating === undefined && review.recommend === undefined) {
-      res.status('400').send('Reviewer rating or recommendation is missing. At least one is needed.');
-    }
-
-    db.addReview(review)
-    .then(() => res.status('201').send())
-    .catch(error => {
-      console.log('Server error', error);
-      res.status('500').send(error);
+        db.getProductReviews(productReviewRequest, filter)
+        .then(result => {
+          if (result) {
+            result.product = productId;
+            // console.log('Result: ', result);
+            res.status('200').send(result);
+          } else {
+            let message = `No results were found associated with product_id ${productId}`;
+            console.log(message);
+            res.status('404').send(message);
+          }
+        })
+        .catch(error => {
+          console.log('getProductReviews error:');
+          console.log('Server error', error);
+          res.status('500').send(error);
+        });
+      } else {
+        res.status('400').send('Product ID missing.');
+      }
     });
-  });
 
-// Updates a review to show it was found helpful.
-router.put('/reviews/:review_id/helpful',
-  (req, res) => {
-    const reviewId = req.params.review_id;
+  // Returns review metadata for a given product.
+  router.get('/reviews/meta',
+    (req, res) => {
+      console.log('req.query: ', req.query);
+      const productId = req.query.product_id;
 
-    if (!reviewId) {
-      res.status('400').send('Review ID missing.');
-    } else {
-      db.markReviewHelpful(reviewId)
-      .then(() => res.status('204').send())
-      .catch(error => {
-        console.log('Server error', error);
-        res.status('500').send(error);
-      });
-    }
-  });
+      if (productId) {
+        let productIdFilter = { product_id: productId};
+        db.getReviewMetadata(productIdFilter)
+        .then(result => {
+          if (result) {
+            console.log('Result: ', result);
+            res.status('200').send(result)
+          } else {
+            let message = `No results were found associated with product_id ${productId}`;
+            console.log(message);
+            res.status('404').send(message);
+          }
+        })
+        .catch(error => {
+          console.log('getReviewMetadata error:', error);
+          console.log('Server error', error);
+          res.status('500').send(error);
+        })
+      } else {
+        res.status('400').send('Review ID missing.');
+      }
+    });
 
-// Updates a review to show it was reported.
-// Note, this action does not delete the review, but the review will not be returned in the above GET request.
-router.get('/reviews/:review_id/report',
-  (req, res) => {
-    const reviewId = req.params.review_id;
+  router.get('/review/',
+    (req, res) => {
+      const reviewId = req.query.review_id;
+      console.log('req.query: ', req.query);
+      if (reviewId) {
+        let reviewIdFilter = { review_id: reviewId};
 
-    if (!reviewId) {
-      res.status('400').send('Review ID missing.');
-    } else {
-      db.reportReview(reviewId)
-      .then(() => res.status('204').send())
-      .catch(error => {
-        console.log('Server error', error);
-        res.status('500').send(error);
-      });
-    }
-  });
+        db.getReview(reviewIdFilter)
+        .then(result => {
+          if (result) {
+            console.log('Result: ', result);
+            res.status('200').send(result);
+          } else {
+            let message = `No results were found associated with review_id ${reviewId}`;
+            console.log(message);
+            res.status('404').send(message);
+          }
+        })
+        .catch(error => {
+          console.log('getReview error:');
+          console.log('Server error', error);
+          res.status('500').send(error);
+        });
+      } else {
+        res.status('400').send('Review ID missing.');
+      }
+    });
+
+  // Adds a review for the given product.
+  router.post('/reviews',
+    (req, res) => {
+
+      let reviewClient = req.body;
+      console.log('req: ', req);
+      console.log('req.body: ', req.body);
+
+      const validator = {
+        message: '',
+        isValidReview: (review) => {
+          if (!review) {
+            this.message = 'Review data is missing.';
+            return false;
+          } else if (!review.name) {
+            this.message = 'Reviewer name is missing.';
+            return false;
+          } else if (!review.email) {
+            this.message = 'Reviewer email is missing.';
+            return false;
+          } else if (review.rating === undefined && review.recommend === undefined) {
+            this.message = 'Reviewer rating or recommendation is missing. At least one is needed.';
+            return false;
+          } else {
+            return true;
+          }
+        }
+      };
+
+      if (validator.isValidReview(reviewClient)) {
+        const review = adaptor.reviewFromServerToDatabase(reviewClient);
+        db.addReview(review)
+        .then((result) => {
+          console.log('Result: ', result);
+          res.status('201').send(result)
+        })
+        .catch(error => {
+          console.log('Server error', error);
+          res.status('500').send(error);
+        });
+      } else {
+        res.status('400').send(validator.message);
+      }
+    });
+
+  // Updates a review to show it was found helpful.
+  router.put('/reviews/:review_id/helpful',
+    (req, res) => {
+      const reviewId = req.params.review_id;
+
+      if (reviewId) {
+        let reviewIdFilter = { review_id: reviewId};
+        db.markReviewHelpful(reviewIdFilter)
+        .then(() => res.status('204').send())
+        .catch(error => {
+          console.log('Server error', error);
+          res.status('500').send(error);
+        });
+      } else {
+        res.status('400').send('Review ID missing.');
+      }
+    });
+
+  // Updates a review to show it was reported.
+  // Note, this action does not delete the review, but the review will not be returned in the above GET request.
+  router.get('/reviews/:review_id/report',
+    (req, res) => {
+      const reviewId = req.params.review_id;
+
+      if (reviewId) {
+        let reviewIdFilter = { review_id: reviewId};
+        db.reportReview(reviewIdFilter)
+        .then(() => res.status('204').send())
+        .catch(error => {
+          console.log('reportReview error:', error);
+          console.log('Server error', error);
+          res.status('500').send(error);
+        });
+      } else {
+        res.status('400').send('Review ID missing.');
+      }
+    });
+})
 
 module.exports = router;
