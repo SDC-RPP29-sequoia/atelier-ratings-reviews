@@ -286,7 +286,7 @@ describe('postgres tests', function () {
         };
 
         let productReviewRequest = {
-          productId: productReviewsExpected.product,
+          product_id: productReviewsExpected.product,
           page: productReviewsExpected.page,
           count: productReviewsExpected.count,
           sortBy: 'newest' };

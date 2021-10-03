@@ -227,15 +227,15 @@ module.exports = (db) => {
     // TODO: Implement other parameters either here or higher up. See which is better
     return new Promise( (resolve, reject) => {
       const {
+        product_id,
         page,
         count,
         sortBy } = productReviewRequest;
-      const productIdFilter = { product_id: productReviewRequest.productId };
 
-      Review.findAll({ where: productIdFilter })
+      Review.findAll({ where: { product_id } })
       .then(rows => {
         if (rows === null || rows.length === 0) {
-          console.log('No reviews found!', productIdFilter);
+          console.log('No reviews found!', { product_id });
           resolve();
         } else {
           let reviews = [];
@@ -395,6 +395,8 @@ module.exports = (db) => {
   };
 
   // TBD: Join with rating & recommended
+  // TBD: Make ratings object keys integers rather than strings
+  // TBD: Make characteristics value property a string rather than float
   const getReviewMetadata = (productIdFilter) => {
     return new Promise( (resolve, reject) => {
       console.log('Getting review metadata!');

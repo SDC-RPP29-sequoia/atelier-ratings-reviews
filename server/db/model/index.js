@@ -79,11 +79,7 @@ module.exports = (envOrConfigIn) => {
           // { review_id: reviewId }
           return new Promise( (resolve, reject) => {
             console.log('reviewId in controller', reviewId);
-            // dbSecondary(envOrConfigIn)
-            // .then(moo => {
-            //   console.log('dbSecondary: ', moo);
               let db = usePrimaryDB ? dbPrimary.methods : dbSecondary.methods;
-              // console.log('db used: ', db);
               // TODO: Later return the appropriate id filter based on the database used via a function, rather than hard-coded
               let reviewIdFilter = { review_id: reviewId};
 
@@ -96,8 +92,6 @@ module.exports = (envOrConfigIn) => {
                 reject(error);
               })
               resolve();
-            // })
-            // .catch(error => reject(error));
           });
         }
         dbModel.methods.getReview = getReview;
@@ -126,7 +120,8 @@ module.exports = (envOrConfigIn) => {
           return new Promise( (resolve, reject) => {
             let db = usePrimaryDB ? dbPrimary.methods : dbSecondary.methods;
 
-            db.reportReview(reviewId)
+            let reviewIdFilter = { review_id: reviewId};
+            db.reportReview(reviewIdFilter)
             .then(() => {
               resolve();
             })
@@ -143,7 +138,8 @@ module.exports = (envOrConfigIn) => {
           return new Promise( (resolve, reject) => {
             let db = usePrimaryDB ? dbPrimary.methods : dbSecondary.methods;
 
-            db.markReviewHelpful(reviewId)
+            let reviewIdFilter = { review_id: reviewId};
+            db.markReviewHelpful(reviewIdFilter)
             .then(() => {
               resolve();
             })
