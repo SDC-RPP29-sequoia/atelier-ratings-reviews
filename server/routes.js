@@ -192,7 +192,7 @@ dbSecondaryInit(() => console.log('Database loaded!'))
 
   // Updates a review to show it was reported.
   // Note, this action does not delete the review, but the review will not be returned in the above GET request.
-  router.get('/reviews/:review_id/report',
+  router.put('/reviews/:review_id/report',
     (req, res) => {
       const reviewId = req.params.review_id;
 

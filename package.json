@@ -7,6 +7,7 @@
     "test": "export NODE_ENV='test' & jest --coverage --testResultsProcessor=jest-sonar-reporter",
     "test-controller": "export NODE_ENV='test' & jest --coverage --testPathPattern=server/db/model --testResultsProcessor=jest-sonar-reporter",
     "test-routes": "export NODE_ENV='test' & jest --coverage --runTestsByPath tests/index.test.js  --testResultsProcessor=jest-sonar-reporter",
+    "test-k6": "export NODE_ENV='test' & k6 run script.js",
     "test-init": "jest --init",
     "test-controller-custom": "node server/db/model/tests/index.customTest.js",
     "coveralls": "export NODE_ENV='test' & jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
