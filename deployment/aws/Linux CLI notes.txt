@@ -1,0 +1,1 @@
+df -h    - Lists file system space usage in a readable way

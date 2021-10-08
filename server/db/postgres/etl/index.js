@@ -65,7 +65,7 @@ const run = () => {
     // .then(() => console.log(`Completed ETL of ${reviews.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
-    // // 19,327,575 entries - 1.58 GB - 1,570,611 entries added (in progress & re-run first 2 mil)
+    // // 19,327,575 entries - 1.58 GB - 4,980,298 entries added (in progress & re-run first 2 mil)
       reviewsToCharacteristics.filename,
       reviewsToCharacteristics.transformAndLoad,
       isDryRun)//)

@@ -1,0 +1,35 @@
+# https://www.howtoforge.com/how-to-increase-the-disk-space-of-an-aws-ec2-ubuntu-instance/
+
+# Go to the EC2 instance -- > Volume attached to the instance.
+# Here you see the volume, click on "Actions" --> "Modify Volumes".
+# On the pop-up screen, specify the desired size. I have specified 30 GBs, earlier it was 8 GBs. Click on the "Modify" button, this will change the disk size to 30GBs.
+# Confirm the modification by clicking on the "Yes" option.
+
+# Extend the Filesystem.
+# At this point, if you check the disk space you will see that the / volume still has 7.7 GBs.
+
+df -h
+
+#To extend the volume size, get information about the block devices attached to your instance using the lsblk command
+
+lsblk
+
+#Check the file system type, use the following command.
+
+blkid
+
+sudo growpart /dev/xvda 1
+
+lsblk
+df -h
+
+#In our case, the file system is of type ext4 of the volume
+#Use the following command to extend the volume of the ext4 type.
+
+sudo resize2fs /dev/xvda1
+
+#If you check the disk size this time, you will see that the disk has been extended and now we have 28 GBs(Approx 30 GBs) for / partition.
+
+df -h
+
+#If you see some other file system than ext4, visit the official documentation of AWS here.

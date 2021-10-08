@@ -1,0 +1,1 @@
+chmod 400 atelier-sequoia-server.cer
