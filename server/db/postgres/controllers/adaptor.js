@@ -75,16 +75,20 @@ module.exports.reviewToOutput = reviewToOutput;
 const reviewMetadataToOutput = (reviewMetadata) => {
   let reviewMetadataOutput = new ReviewMetadata(reviewMetadata.product_id);
 
-  for (let starKey in reviewMetadata.rating) {
-    let starComponents = starKey.split('_');
-    if (starComponents.length < 2) {
-      continue;
+  if (reviewMetadata.rating && reviewMetadata.rating.length > 0) {
+    for (let starKey in reviewMetadata.rating) {
+      let starComponents = starKey.split('_');
+      if (starComponents.length < 2) {
+        continue;
+      }
+      let starValue = starComponents[1];
+      reviewMetadataOutput.addRating(starValue, reviewMetadata.rating[starKey]);
     }
-    let starValue = starComponents[1];
-    reviewMetadataOutput.addRating(starValue, reviewMetadata.rating[starKey]);
+  } else {
+    reviewMetadataOutput.addRating(0, 0);
   }
 
-  if (reviewMetadata.recommended) {
+  if (reviewMetadata.recommended && reviewMetadata.recommended.length > 0) {
     const recommendedValues = ['true', 'false'];
     recommendedValues.forEach(recommendedValue => {
       if (reviewMetadata.recommended[recommendedValue]) {
@@ -94,9 +98,11 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         );
       }
     });
+  } else {
+    // reviewMetadata.recommended[recommendedValue]
   }
 
-  if (reviewMetadata.characteristics) {
+  if (reviewMetadata.characteristics && reviewMetadata.characteristics.length > 0) {
     reviewMetadata.characteristics.forEach(characteristic => {
       let totalRatings = 0;
       let totalValue = 0;
@@ -127,6 +133,11 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         characteristic.name,
         value);
     });
+  } else {
+    // reviewMetadataOutput.addCharacteristic(
+    //   characteristic.characteristic_id,
+    //   characteristic.name,
+    //   value);
   }
 
   return reviewMetadataOutput;
