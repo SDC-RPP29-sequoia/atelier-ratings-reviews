@@ -15,7 +15,7 @@ module.exports = {
     username: process.env.USERNAME_POSTGRES,
     password: process.env.PASSWORD_POSTGRES,
     dialect: 'postgres',
-    logging: false,conf
+    logging: false,
     // define: { timestamps: false }
   },
   test: {

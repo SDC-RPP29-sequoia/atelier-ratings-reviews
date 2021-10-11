@@ -15,7 +15,7 @@ const getFilePath = (filename, dryRun) => {
   return path.resolve(initialPath, filename);
 }
 
-const lineNumberMultiple = 16; // For _to_characteristics: 8; 17, for _to_photos: 0
+const lineNumberMultiple = 15; // For _to_characteristics: 8; 18, for _to_photos: 0
 const lineNumberMuplipleSpread = 1; // for _to_photos: 3
 module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000, maxCollectionRun = 100) => {
   return new Promise((resolve, reject) => {

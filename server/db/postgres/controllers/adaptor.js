@@ -4,7 +4,7 @@ const Review = require('../../../contractObjects/output/Review.js');
 const ReviewMetadata = require('../../../contractObjects/output/ReviewMetadata.js');
 
 const productReviewsToOutput = (reviews, productReviewRequest) => {
-  const { productId, page, count } = productReviewRequest;
+  const { product_id, page, count } = productReviewRequest;
 
   const productReviewsOutput = new ProductReviews(productId, page, count);
   reviews.forEach(review => {
@@ -74,8 +74,15 @@ module.exports.reviewToOutput = reviewToOutput;
 
 const reviewMetadataToOutput = (reviewMetadata) => {
   let reviewMetadataOutput = new ReviewMetadata(reviewMetadata.product_id);
+  console.log('reviewMetadata', reviewMetadata);
+  console.log('reviewMetadataToOutput', reviewMetadataOutput);
 
-  if (reviewMetadata.rating && reviewMetadata.rating.length > 0) {
+  const propertyObjectHasItems = (objectProperty) => {
+    return (objectProperty && Object.keys(objectProperty).length > 0);
+  }
+
+  if (reviewMetadata.rating_id) {//(propertyObjectHasItems(reviewMetadataOutput.ratings)) {
+    console.log('propertyObjectHasItems: ratings');
     for (let starKey in reviewMetadata.rating) {
       let starComponents = starKey.split('_');
       if (starComponents.length < 2) {
@@ -85,10 +92,12 @@ const reviewMetadataToOutput = (reviewMetadata) => {
       reviewMetadataOutput.addRating(starValue, reviewMetadata.rating[starKey]);
     }
   } else {
-    reviewMetadataOutput.addRating(0, 0);
+    console.log('ratings empty');
+    reviewMetadataOutput.addRating(0, 1);
   }
 
-  if (reviewMetadata.recommended && reviewMetadata.recommended.length > 0) {
+  if (reviewMetadata.recommended_id) { //(propertyObjectHasItems(reviewMetadataOutput.recommended)) {
+    console.log('propertyObjectHasItems: recommended');
     const recommendedValues = ['true', 'false'];
     recommendedValues.forEach(recommendedValue => {
       if (reviewMetadata.recommended[recommendedValue]) {
@@ -99,10 +108,12 @@ const reviewMetadataToOutput = (reviewMetadata) => {
       }
     });
   } else {
+    console.log('recommended empty');
     // reviewMetadata.recommended[recommendedValue]
   }
 
-  if (reviewMetadata.characteristics && reviewMetadata.characteristics.length > 0) {
+  if (reviewMetadata.characteristics && reviewMetadata.characteristics.length > 0) { //(propertyObjectHasItems(reviewMetadataOutput.characteristics)) {
+    console.log('propertyObjectHasItems: characteristics');
     reviewMetadata.characteristics.forEach(characteristic => {
       let totalRatings = 0;
       let totalValue = 0;
@@ -134,12 +145,14 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         value);
     });
   } else {
+    console.log('characteristics empty');
     // reviewMetadataOutput.addCharacteristic(
     //   characteristic.characteristic_id,
     //   characteristic.name,
     //   value);
   }
 
+  console.log('reviewMetadataToOutput', reviewMetadataOutput);
   return reviewMetadataOutput;
 }
 module.exports.reviewMetadataToOutput = reviewMetadataToOutput;

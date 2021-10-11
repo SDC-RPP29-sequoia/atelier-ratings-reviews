@@ -913,7 +913,9 @@ describe('postgres tests', function () {
     it('Returns metadata for the reviews of an existing product with no ratings or recommendations', done => {
       let metadataExpected = {
         product_id: 11,
-        ratings: {},
+        ratings: {
+          "0": 1
+        },
         recommended: {},
         characteristics: {}
       };

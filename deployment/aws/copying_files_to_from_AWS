@@ -1,0 +1,10 @@
+# https://dearsikandarkhan.medium.com/files-copying-between-aws-ec2-and-local-d07ed205eefa
+
+# Copying files from local to EC2
+scp -i path/to/key /local/file/to/copy user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file
+
+# Copying directory from local to EC2
+scp -i path/to/key -r local/directory/to/copy user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/directory
+
+# Copying files from EC2 to local
+scp -i path/to/key user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file export NODE_ENV=production/local/directory/files/to/download

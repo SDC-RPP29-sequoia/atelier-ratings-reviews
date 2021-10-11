@@ -1,1 +1,8 @@
+# https://pankajconnect.medium.com/all-about-pg-hba-conf-authentication-methods-postgresql-95137d896105
+
 df -h    - Lists file system space usage in a readable way
+
+# list files & subdirectories
+ls
+
+sudo cp source destination

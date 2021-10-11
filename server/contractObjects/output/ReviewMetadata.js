@@ -8,7 +8,7 @@ class ReviewMetadata {
 
   addRating(star, count) {
     const starProperty = parseInt(star);
-    if (count && starProperty) {
+    if (count && starProperty !== undefined && starProperty !== null) {
       this.ratings[starProperty] = count;
     }
   }
