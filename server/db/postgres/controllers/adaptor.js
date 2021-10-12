@@ -6,7 +6,7 @@ const ReviewMetadata = require('../../../contractObjects/output/ReviewMetadata.j
 const productReviewsToOutput = (reviews, productReviewRequest) => {
   const { product_id, page, count } = productReviewRequest;
 
-  const productReviewsOutput = new ProductReviews(productId, page, count);
+  const productReviewsOutput = new ProductReviews(product_id, page, count);
   reviews.forEach(review => {
     const reviewOutput = new ProductReview();
 

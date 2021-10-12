@@ -343,7 +343,7 @@ module.exports = (db) => {
           const getPhotos = [];
           results.forEach(result => {
             let row = result.get();
-            getPhotos.push(getPhoto({ photo_id: row.photo_id }));
+            getPhotos.push(getPhoto({ id: row.photo_id }));
           });
           Promise.all(getPhotos)
           .then(photos => {

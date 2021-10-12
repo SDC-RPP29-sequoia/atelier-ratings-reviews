@@ -4,7 +4,14 @@ module.exports = (sequelize, DataTypes) => {
     review_id: DataTypes.INTEGER, // allowNull: false
     rating: DataTypes.INTEGER, // allowNull: false
   }, {
-    tableName: 'review_to_characteristic'
+    tableName: 'review_to_characteristic',
+    indexes: [{
+      unique: true,
+      fields: [
+        'review_id',
+        'characteristic_id',
+      ]
+    }]
   });
   ReviewToCharacteristic.associate = function(models) {
     ReviewToCharacteristic.belongsTo(models.Review, {

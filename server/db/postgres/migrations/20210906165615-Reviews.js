@@ -59,6 +59,17 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
+    }, {
+      uniqueKeys: {
+        unique_tag: {
+            customIndex: true,
+            fields: [
+              'review_id',
+              'product_id',
+              'profile_id'
+            ]
+        }
+      }
     });
   },
 

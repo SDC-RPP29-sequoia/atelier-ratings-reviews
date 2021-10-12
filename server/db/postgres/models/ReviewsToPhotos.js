@@ -3,7 +3,14 @@ module.exports = (sequelize, DataTypes) => {
     photo_id: DataTypes.INTEGER, // allowNull: false
     review_id: DataTypes.INTEGER, // allowNull: false
   }, {
-    tableName: 'review_to_photo'
+    tableName: 'review_to_photo',
+    indexes: [{
+      unique: true,
+      fields: [
+        'review_id',
+        'photo_id',
+      ]
+    }]
   });
   ReviewToPhoto.associate = function(models) {
     ReviewToPhoto.belongsTo(models.Photo, {

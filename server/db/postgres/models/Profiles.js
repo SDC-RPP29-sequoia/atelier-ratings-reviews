@@ -3,7 +3,11 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     email: DataTypes.STRING
   }, {
-    tableName: 'profile'
+    tableName: 'profile',
+    indexes: [{
+      unique: true,
+      fields: ['username']
+    }]
   });
   Profile.associate = function(models) {
     Profile.hasMany(models.Review, {
