@@ -6,10 +6,12 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'review_to_photo',
     indexes: [{
       unique: true,
-      fields: [
-        'review_id',
-        'photo_id',
-      ]
+      name: 'idx_review_to_photo_review_id',
+      fields: ['review_id']
+    }, {
+      unique: true,
+      name: 'idx_review_to_photo_photo_id',
+      fields: ['photo_id']
     }]
   });
   ReviewToPhoto.associate = function(models) {

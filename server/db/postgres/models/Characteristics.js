@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'characteristic',
     indexes: [{
       unique: true,
+      name: 'idx_characteristic_characteristic_id',
       fields: ['characteristic_id']
     }]
   });

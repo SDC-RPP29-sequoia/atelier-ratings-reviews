@@ -25,13 +25,13 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      uniqueKeys: {
-        unique_tag: {
-            customIndex: true,
-            fields: ['username']
-        }
-      }
+    // }, {
+    //   uniqueKeys: {
+    //     unique_tag: {
+    //         customIndex: true,
+    //         fields: ['username']
+    //     }
+    //   }
     });
   },
 

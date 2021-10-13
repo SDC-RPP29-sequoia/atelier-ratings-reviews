@@ -59,18 +59,28 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      uniqueKeys: {
-        unique_tag: {
-            customIndex: true,
-            fields: [
-              'review_id',
-              'product_id',
-              'profile_id'
-            ]
-        }
-      }
-    });
+    // }, {
+    //   uniqueKeys: {
+    //     unique_tag: {
+    //         customIndex: true,
+    //         name: 'idx_review_review_id',
+    //         fields: ['review_id']
+    //     },
+    //   }
+    // }).then((queryInterface, Sequelize) => {
+    //   queryInterface.addIndex(
+    //     'review',
+    //     ['review_id'],
+    //     {
+    //       name: 'idx_review_review_id',
+    //       indicesType: 'UNIQUE',
+    //       where: { bool : 'true' },
+    //     }
+    //   );
+    });//;//.then(() => queryInterface.addConstraint('review', ['review_id'], {
+    //   type: 'unique',
+    //   name: 'idx_review_review_id'
+    // }));
   },
 
   down: async (queryInterface, Sequelize) => {

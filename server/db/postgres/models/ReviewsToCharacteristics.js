@@ -7,10 +7,12 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'review_to_characteristic',
     indexes: [{
       unique: true,
-      fields: [
-        'review_id',
-        'characteristic_id',
-      ]
+      name: 'idx_review_to_characteristic_review_id',
+      fields: ['review_id']
+    }, {
+      unique: true,
+      name: 'idx_review_to_characteristic_characteristic_id',
+      fields: ['characteristic_id']
     }]
   });
   ReviewToCharacteristic.associate = function(models) {

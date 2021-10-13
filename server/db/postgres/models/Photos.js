@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'photo',
     indexes: [{
       unique: true,
+      name: 'idx_photo_photo_id',
       fields: ['photo_id']
     }]
   });

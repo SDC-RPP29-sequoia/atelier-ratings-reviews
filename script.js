@@ -95,9 +95,9 @@ export let options = {
 };
 
 export default function () {
-  const testEnv = 'scaled'; //process.env.NODE_ENV || 'test'; 'scaled'
-  // getReview(testEnv);
-  getProductReviews(testEnv);
+  const testEnv = 'test'; //process.env.NODE_ENV || 'test'; 'scaled'
+  getReview(testEnv);
+  // getProductReviews(testEnv);
   // getReviewMetadata(testEnv);
   // addReview(testEnv);
   // markReviewHelpful(testEnv);
@@ -114,7 +114,7 @@ const getReview = (testEnv) => {
   let reviewIds = testEnv === 'test'
     ? [ 2, 3, 5 ] // Test DB
     : [ 5, 2107492, 5765000 ]; // Scaled DB
-  const res = http.get(`${url}:${port}/review?review_id=${reviewIds[0]}`, {
+  const res = http.get(`${url}:${port}/review?review_id=${reviewIds[1]}`, {
     tags: { name: 'getReviewURL' },
   });
   const latency = Date.now() - start;
@@ -131,7 +131,7 @@ const getProductReviews = (testEnv) => {
   let productIds = testEnv === 'test'
     ? [ 1, 2 ] // Test DB
     : [ 496, 378894, 708406 ]; // Scaled DB
-  const res = http.get(`${url}:${port}/reviews?product_id=${productIds[2]}`, {
+  const res = http.get(`${url}:${port}/reviews?product_id=${productIds[0]}`, {
     tags: { name: 'getProductReviewsURL' },
   });
   const latency = Date.now() - start;

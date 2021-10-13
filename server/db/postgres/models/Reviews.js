@@ -13,15 +13,19 @@ module.exports = (sequelize, DataTypes) => {
     reported: DataTypes.BOOLEAN,
   }, {
     tableName: 'review',
-    indexes: [
-      {
+    indexes: [{
         unique: true,
-        fields: [
-          'review_id',
-          'product_id',
-          'profile_id',
-        ]
-      }]
+        name: 'idx_review_review_id',
+        fields: ['review_id']
+      }, {
+        unique: false,
+        name: 'idx_review_product_id',
+        fields: ['product_id']
+      }, {
+        unique: false,
+        name: 'idx_review_profile_id',
+        fields: ['profile_id']
+    }]
   });
   Review.associate = function(models) {
     Review.belongsTo(models.Product, {

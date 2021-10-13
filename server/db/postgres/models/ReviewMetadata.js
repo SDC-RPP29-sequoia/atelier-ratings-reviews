@@ -7,11 +7,16 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'review_metadata',
     indexes: [{
       unique: true,
-      fields: [
-        'product_id',
-        'rating_id',
-        'recommended_id',
-      ]
+      name: 'idx_review_metadata_review_id',
+      fields: ['product_id']
+    }, {
+      unique: true,
+      name: 'idx_review_metadata_rating_id',
+      fields: ['rating_id']
+    }, {
+      unique: true,
+      name: 'idx_review_metadata_recommended_id',
+      fields: ['recommended_id']
     }]
   });
   ReviewMetadata.associate = function(models) {
