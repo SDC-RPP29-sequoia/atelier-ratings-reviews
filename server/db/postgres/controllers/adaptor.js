@@ -4,9 +4,9 @@ const Review = require('../../../contractObjects/output/Review.js');
 const ReviewMetadata = require('../../../contractObjects/output/ReviewMetadata.js');
 
 const productReviewsToOutput = (reviews, productReviewRequest) => {
-  const { productId, page, count } = productReviewRequest;
+  const { product_id, page, count } = productReviewRequest;
 
-  const productReviewsOutput = new ProductReviews(productId, page, count);
+  const productReviewsOutput = new ProductReviews(product_id, page, count);
   reviews.forEach(review => {
     const reviewOutput = new ProductReview();
 
@@ -17,11 +17,11 @@ const productReviewsToOutput = (reviews, productReviewRequest) => {
     reviewOutput.response = review.response;
     reviewOutput.body = review.body;
     reviewOutput.date = review.date;
-    reviewOutput.reviewer_name = review.username;
+    reviewOutput.reviewer_name = review.user.username;
     reviewOutput.helpfulness = review.helpfulness;
 
-    if (review.photos && review.photos.length > 0) {
-      review.photos.forEach(photo => {
+    if (review.Photos && review.Photos.length > 0) {
+      review.Photos.forEach(photo => {
         reviewOutput.addPhoto(photo.photo_id, photo.url);
       });
     } else {
@@ -61,7 +61,7 @@ const reviewToOutput = (review) => {
       reviewOutput.addCharacteristic(
         characteristic.characteristic_id,
         characteristic.name,
-        characteristic.rating
+        characteristic.ReviewToCharacteristic.rating
       );
     });
   } else {
@@ -74,17 +74,25 @@ module.exports.reviewToOutput = reviewToOutput;
 
 const reviewMetadataToOutput = (reviewMetadata) => {
   let reviewMetadataOutput = new ReviewMetadata(reviewMetadata.product_id);
+  // console.log('reviewMetadata', reviewMetadata);
+  // console.log('reviewMetadataToOutput', reviewMetadataOutput);
 
-  for (let starKey in reviewMetadata.rating) {
-    let starComponents = starKey.split('_');
-    if (starComponents.length < 2) {
-      continue;
+  if (reviewMetadata.rating) {
+    // console.log('propertyObjectHasItems: ratings');
+    for (let starKey in reviewMetadata.rating) {
+      let starComponents = starKey.split('_');
+      if (starComponents.length < 2) {
+        continue;
+      }
+      let starValue = parseInt(starComponents[1]);
+      reviewMetadataOutput.addRating(starValue, reviewMetadata.rating[starKey]);
     }
-    let starValue = starComponents[1];
-    reviewMetadataOutput.addRating(starValue, reviewMetadata.rating[starKey]);
+  } else {
+    // console.log('ratings empty');
   }
 
   if (reviewMetadata.recommended) {
+    // console.log('propertyObjectHasItems: recommended');
     const recommendedValues = ['true', 'false'];
     recommendedValues.forEach(recommendedValue => {
       if (reviewMetadata.recommended[recommendedValue]) {
@@ -94,16 +102,19 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         );
       }
     });
+  } else {
+    // console.log('recommended empty');
   }
 
-  if (reviewMetadata.characteristics) {
+  if (reviewMetadata.characteristics && reviewMetadata.characteristics.length > 0) {
+    // console.log('propertyObjectHasItems: characteristics');
     reviewMetadata.characteristics.forEach(characteristic => {
       let totalRatings = 0;
       let totalValue = 0;
       let value = 0;
 
       if (characteristic.rating) {
-        let rating = characteristic.rating;
+        let rating = characteristic.rating?.get();
         for (let starKey in rating) {
           let starComponents = starKey.split('_');
           if (starComponents.length < 2) {
@@ -117,7 +128,7 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         }
         // TODO: Ratings should be put into form of star: count in adaptor (maybe stars adaptor).
         // TODO: Averages should be determined at highest model level before being passed back to routes
-        value = totalRatings > 0 ? parseFloat((totalValue / totalRatings).toFixed(2)) : null;
+        value = totalRatings > 0 ? parseFloat((totalValue / totalRatings).toFixed(2)).toString() : null;
       } else {
         value = null;
       }
@@ -127,8 +138,11 @@ const reviewMetadataToOutput = (reviewMetadata) => {
         characteristic.name,
         value);
     });
+  } else {
+    // console.log('characteristics empty');
   }
 
+  // console.log('reviewMetadataToOutput', reviewMetadataOutput);
   return reviewMetadataOutput;
 }
 module.exports.reviewMetadataToOutput = reviewMetadataToOutput;

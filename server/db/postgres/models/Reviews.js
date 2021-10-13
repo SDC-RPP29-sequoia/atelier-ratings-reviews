@@ -12,7 +12,20 @@ module.exports = (sequelize, DataTypes) => {
     helpfulness: DataTypes.INTEGER,
     reported: DataTypes.BOOLEAN,
   }, {
-    tableName: 'review'
+    tableName: 'review',
+    indexes: [{
+        unique: true,
+        name: 'idx_review_review_id',
+        fields: ['review_id']
+      }, {
+        unique: false,
+        name: 'idx_review_product_id',
+        fields: ['product_id']
+      }, {
+        unique: false,
+        name: 'idx_review_profile_id',
+        fields: ['profile_id']
+    }]
   });
   Review.associate = function(models) {
     Review.belongsTo(models.Product, {

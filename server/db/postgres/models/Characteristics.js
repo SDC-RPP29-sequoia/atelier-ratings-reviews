@@ -5,7 +5,12 @@ module.exports = (sequelize, DataTypes) => {
     rating_id: DataTypes.INTEGER,
     review_metadata_id: DataTypes.INTEGER, // allowNull: false
   }, {
-    tableName: 'characteristic'
+    tableName: 'characteristic',
+    indexes: [{
+      unique: true,
+      name: 'idx_characteristic_characteristic_id',
+      fields: ['characteristic_id']
+    }]
   });
   Characteristic.associate = function(models) {
     Characteristic.belongsTo(models.ReviewMetadata, {

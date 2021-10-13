@@ -59,7 +59,58 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    // }, {
+    //   indexes: [{
+    //     unique: true,
+    //     name: 'idx_review_review_id',
+    //     fields: ['review_id']
+    //   }, {
+    //     unique: false,
+    //     name: 'idx_review_product_id',
+    //     fields: ['product_id']
+    //   }, {
+    //     unique: false,
+    //     name: 'idx_review_profile_id',
+    //     fields: ['profile_id']
+    // }]
+      // }
+      }, {
+        uniqueKeys: {
+          idx_review_review_id: {
+            fields: ['review_id'],
+            customIndex: true
+          },
+          // idx_review_product_id: {
+          //   fields: ['product_id'],
+          //   customIndex: true
+          // },
+          // idx_review_profile_id: {
+          //   fields: ['profile_id'],
+          //   customIndex: true
+          // }
+        }
+    // }, {
+    //   uniqueKeys: {
+    //     unique_tag: {
+    //         customIndex: true,
+    //         name: 'idx_review_review_id',
+    //         fields: ['review_id']
+    //     },
+    //   }
+    // }).then((queryInterface, Sequelize) => {
+    //   queryInterface.addIndex(
+    //     'review',
+    //     ['review_id'],
+    //     {
+    //       name: 'idx_review_review_id',
+    //       indicesType: 'UNIQUE',
+    //       where: { bool : 'true' },
+    //     }
+    //   );
+    });//;//.then(() => queryInterface.addConstraint('review', ['review_id'], {
+    //   type: 'unique',
+    //   name: 'idx_review_review_id'
+    // }));
   },
 
   down: async (queryInterface, Sequelize) => {

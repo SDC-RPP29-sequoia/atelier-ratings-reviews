@@ -1,5 +1,5 @@
 const adaptor = require('./adaptor.js');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 module.exports = (db) => {
   const {
@@ -11,7 +11,8 @@ module.exports = (db) => {
     Profile,
     Photo,
     ReviewToPhoto,
-    ReviewToCharacteristic } = db;
+    ReviewToCharacteristic,
+    Product } = db;
 
   // ===== Create Methods =====
   const addReview = (reviewServer) => {
@@ -232,100 +233,113 @@ module.exports = (db) => {
         count,
         sortBy } = productReviewRequest;
 
-      Review.findAll({ where: { product_id } })
-      .then(rows => {
-        if (rows === null || rows.length === 0) {
-          console.log('No reviews found!', { product_id });
-          resolve();
-        } else {
-          let reviews = [];
-          rows.forEach(row => {
-            reviews.push(row.get());
-          });
+        // TODO: filter - limit reviews up to a specified star rating
 
-          const addUserName = (review) => {
-            return new Promise((resolve, reject) => {
-              Profile.findOne({ where: { id: review.profile_id }})
-              .then(result => {
-                const profile = result.get();
-                review.username = profile.username;
-                resolve();
-              })
-              .catch(error => {
-                console.log('Error in adding username to review', error);
-                reject(error);
-              });
-            });
-          };
-
-          const addUserNames = [];
-          reviews.forEach(review => {
-            addUserNames.push(addUserName(review));
-          });
-
-          Promise.all(addUserNames)
-          .then(() => resolve(adaptor.productReviewsToOutput(reviews, productReviewRequest)))
-          .catch(error => {
-            console.log('Error in getting product reviews', error);
-            reject();
-          });
+        const orderSet = [['review_id', 'ASC']];
+        if (sortBy === 'newest') {
+          orderSet.unshift(['date', 'DESC']);
+        } else if (sortBy === 'helpful') {
+          orderSet.unshift(['helpfulness', 'DESC']);
+          // TODO: Finish - Helpful - This sort order will prioritize reviews that have been found helpful.
+          // The order can be found by subtracting “No” responses from “Yes” responses and sorting such that the highest score appears at the top.
+        } else if (sortBy === 'relevant') {
+          orderSet.unshift(['helpfulness', 'DESC']);
+          orderSet.unshift(['date', 'DESC']);
+          // TODO: Finish - Relevant - Relevance will be determined by a combination of both the date that the review was submitted as well as ‘helpfulness’ feedback received.
+          // This combination should weigh the two characteristics such that recent reviews appear near the top, but do not outweigh reviews that have been found helpful.
+          // Similarly, reviews that have been helpful should appear near the top, but should yield to more recent reviews if they are older.
         }
-      })
-      .catch(error => {
-        console.log('getProductReviews error:', error);
-        reject(error);
-      });
+
+        Product.findOne({
+          where: {
+            product_id
+          },
+          include: [{
+            model: Review,
+            as: 'review',
+            where: {
+              reported: { [Op.not]: true }
+            },
+            offset:  page * count,
+            limit: count,
+            order: [['review_id', 'ASC']],
+            include: [{
+                model: Profile,
+                as: 'user',
+                attributes: ['username']
+              }, {
+                model: Photo,
+                as: 'Photos',
+                required: false,
+                attributes: ['photo_id', 'url']
+              }
+            ]
+          }]
+        })
+        .then(product => {
+          if (product === null || product.review === null || product.review.length === 0) {
+            console.log('No reviews found!', { product_id });
+            resolve();
+          } else {
+            resolve(adaptor.productReviewsToOutput(product.review, productReviewRequest));
+          }
+        })
+        .catch(error => {
+          console.log('getProductReviews error:', error);
+          reject(error);
+        });
     });
   };
 
-  // TBD: Table join for reviewer name, characteristics (joined to rating), photos
-  const getReview = (reviewIdFilter, getCharacteristics = true) => {
+  const getReview = (reviewIdFilter) => {
     return new Promise( (resolve, reject) => {
-      console.log('getReview promise');
-      let review;
-      Review.findOne({ where: reviewIdFilter })
-      .then(row => {
-        if (row === null) {
-          console.log('Review not found!', reviewIdFilter);
-          resolve();
-        } else {
-          console.log('Row: ', row);
-          review = row.get();
-          if (review.reported) {
-            console.log('Review has been reported and will not be returned');
-            resolve();
-          } else {
-            // TBD: Naive solution. Later implement table joins.
-            const characteristicsCB = getCharacteristics
-            ? getReviewCharacteristics
-            : () => new Promise(resolve => resolve());
 
-            Promise.all([
-              getProfile(review.profile_id),
-              getReviewPhotos(review.id),
-              characteristicsCB(review.id)
-            ])
-            .then(results => {
-              let profile = results[0];
-              review.username = profile.username;
+      reviewIdFilter.reported = {
+        [Op.not]: true
+      }
 
-              let photos = results[1];
-              if (photos) {
-                review.photos = photos;
-              }
-
-              let characteristics = results[2];
-              if (characteristics) {
-                review.characteristics = characteristics;
-              }
-            })
-            .then(() => {
-              console.log('review: ', review);
-              resolve(adaptor.reviewToOutput(review));
-            })
+      Review.findOne({
+        where: reviewIdFilter,
+        include: [{
+            model: Profile,
+            as: 'user',
+            attributes: ['username']
+          }, {
+            model: Product,
+            as: 'product',
+            attributes: ['product_id']
+          }, {
+            model: Photo,
+            as: 'Photos',
+            required: false,
+            attributes: ['photo_id', 'url']
+          }, {
+            model: Characteristic,
+            as: 'Characteristics',
+            required: false,
           }
-        }
+        ]
       })
+      .then(reviewItem => {
+        let review = (reviewItem === null)
+          ? undefined
+          : adaptor.reviewToOutput({
+              review_id: reviewItem.review_id,
+              product_id: reviewItem.product.product_id,
+              username: reviewItem.user.username,
+              rating: reviewItem.rating,
+              summary: reviewItem.summary,
+              recommend: reviewItem.recommend,
+              body: reviewItem.body,
+              response: reviewItem.response,
+              date: reviewItem.date,
+              helpfulness: reviewItem.helpfulness,
+              photos: reviewItem.Photos,
+              characteristics: reviewItem.Characteristics,
+          });
+          resolve(review);
+        }
+      )
       .catch(error => {
         console.log('getReview error:', error);
         reject(error);
@@ -343,7 +357,7 @@ module.exports = (db) => {
           const getPhotos = [];
           results.forEach(result => {
             let row = result.get();
-            getPhotos.push(getPhoto({ photo_id: row.photo_id }));
+            getPhotos.push(getPhoto({ id: row.photo_id }));
           });
           Promise.all(getPhotos)
           .then(photos => {
@@ -394,9 +408,7 @@ module.exports = (db) => {
     });
   };
 
-  // TBD: Join with rating & recommended
-  // TBD: Make ratings object keys integers rather than strings
-  // TBD: Make characteristics value property a string rather than float
+
   const getReviewMetadata = (productIdFilter) => {
     return new Promise( (resolve, reject) => {
       console.log('Getting review metadata!');
@@ -405,7 +417,7 @@ module.exports = (db) => {
         if (metadata) {
           resolve(adaptor.reviewMetadataToOutput(metadata));
         } else {
-          resolve(undefined);
+          resolve();
         }
       })
       .catch( error => {
@@ -417,56 +429,105 @@ module.exports = (db) => {
 
   const getReviewMetadataRaw = (productIdFilter) => {
     return new Promise( (resolve, reject) => {
-      ReviewMetadata.findOne({ where: productIdFilter })
-      .then(row => {
-        if (row === null) {
+      ReviewMetadata.findOne({
+        where: productIdFilter,
+        include: [{
+          model: Product,
+          as: 'product',
+          attributes: ['product_id']
+        }, {
+          model: Rating,
+          as: 'rating',
+          required: false,
+        }, {
+          model: Recommended,
+          as: 'recommended',
+          required: false,
+        }, {
+          model: Characteristic,
+          as: 'characteristics',
+          required: false,
+          include: [{
+            model: Rating,
+            as: 'rating',
+            required: false,
+          }]
+        }]
+      })
+      .then(metadata => {
+        // console.log('metadata: ', metadata);
+        if (metadata) {
+          resolve(Object.assign(
+            {},
+            {
+              product_id: metadata.product.product_id,
+              rating: metadata.rating?.get(),
+              recommended: metadata.recommended?.get(),
+              characteristics: metadata.characteristics
+            })
+          );
+        } else {
           console.log('ReviewMetadata not found!', productIdFilter);
           resolve();
-        } else {
-          let metadata = row.get();
-
-          let otherData = [];
-          if (metadata.rating_id) {
-            otherData.push(getRating({ id: metadata.rating_id }));
-          } else {
-            otherData.push(new Promise(resolve => resolve()));
-          }
-          if (metadata.recommended_id) {
-            otherData.push(getRecommended({ id: metadata.recommended_id }));
-          } else {
-            otherData.push(new Promise(resolve => resolve()));
-          }
-          otherData.push(getCharacteristics({ review_metadata_id: metadata.id}));
-
-          Promise.all(otherData)
-          .then(results => {
-            let rating = results[0];
-            if (rating) {
-              metadata.rating = rating;
-            }
-
-            let recommended = results[1];
-            if (recommended) {
-              metadata.recommended = recommended;
-            }
-
-            let characteristics = results[2];
-            if (characteristics) {
-              metadata.characteristics = characteristics;
-            }
-
-            resolve(metadata);
-          })
-          .catch(error => {
-            console.log('Error getting ratings & recommendations for review metadata', error);
-            reject(error);
-          })
         }
       })
       .catch( error => {
         console.log('getReviewMetadata error:', error);
         reject(error);
       });
+
+      // ReviewMetadata.findOne({
+      //   where: productIdFilter
+      // })
+      // .then(row => {
+      //   if (row === null) {
+      //     console.log('ReviewMetadata not found!', productIdFilter);
+      //     resolve();
+      //   } else {
+      //     let metadata = row.get();
+
+      //     let otherData = [];
+      //     if (metadata.rating_id) {
+      //       otherData.push(getRating({ id: metadata.rating_id }));
+      //     } else {
+      //       otherData.push(new Promise(resolve => resolve()));
+      //     }
+      //     if (metadata.recommended_id) {
+      //       otherData.push(getRecommended({ id: metadata.recommended_id }));
+      //     } else {
+      //       otherData.push(new Promise(resolve => resolve()));
+      //     }
+      //     otherData.push(getCharacteristics({ review_metadata_id: metadata.id}));
+
+      //     Promise.all(otherData)
+      //     .then(results => {
+      //       let rating = results[0];
+      //       if (rating) {
+      //         metadata.rating = rating;
+      //       }
+
+      //       let recommended = results[1];
+      //       if (recommended) {
+      //         metadata.recommended = recommended;
+      //       }
+
+      //       let characteristics = results[2];
+      //       if (characteristics) {
+      //         metadata.characteristics = characteristics;
+      //       }
+
+      //       resolve(metadata);
+      //     })
+      //     .catch(error => {
+      //       console.log('Error getting ratings & recommendations for review metadata', error);
+      //       reject(error);
+      //     })
+      //   }
+      // })
+      // .catch( error => {
+      //   console.log('getReviewMetadata error:', error);
+      //   reject(error);
+      // });
     });
   };
 
@@ -478,9 +539,32 @@ module.exports = (db) => {
     return getFromOne(photoIdFilter, Photo, 'getPhoto');
   }
 
-  // TBD: Use rating join
+  //#### TBD: Use rating join
   const getCharacteristic = (characteristicIdFilter) => {
     return new Promise((resolve, reject) => {
+      // Characteristic.findOne({
+      //   where: characteristicIdFilter,
+      //   include: {
+      //     model: Rating,
+      //     as: 'rating',
+      //     required: false
+      //   }
+      // })
+      // .then(row => {
+      //   if (row === null) {
+      //     console.log(`${Characteristic.name} not found!`, characteristicIdFilter);
+      //     resolve();
+      //   } else {
+      //     let item = row.get();
+      //     // console.log('Inner Join Char-rating: ', item);
+      //     resolve(item);
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(`getCharacteristic error:`, error);
+      //   reject(error);
+      // });
+
       getFromOne(characteristicIdFilter, Characteristic, 'getCharacteristic')
       .then(characteristic => {
         if (characteristic) {
@@ -500,9 +584,31 @@ module.exports = (db) => {
     });
   }
 
-  // TBD: Use rating join
+  //### TBD: Use rating join
   const getCharacteristics = (characteristicIdFilter) => {
     return new Promise((resolve, reject) => {
+      // Characteristic.findAll({
+      //   where: characteristicIdFilter,
+      //   include: {
+      //     model: Rating,
+      //     as: 'rating',
+      //     required: false
+      //   }
+      //  })
+      // .then(rows => {
+      //   if (rows === null || rows.length === 0) {
+      //     console.log(`${getCharacteristics.name} not found!`, characteristicIdFilter);
+      //     resolve();
+      //   } else {
+      //     console.log('Inner Join Chars-rating: ', rows);
+      //     resolve(rows);
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(`getCharacteristics error:`, error);
+      //   reject(error);
+      // });
+
       let getCharacteristicRatings = [];
       getFromMany(characteristicIdFilter, Characteristic, 'getCharacteristics')
       .then(rows => {

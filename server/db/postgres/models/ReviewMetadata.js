@@ -4,7 +4,20 @@ module.exports = (sequelize, DataTypes) => {
     rating_id: DataTypes.INTEGER,
     recommended_id: DataTypes.INTEGER,
   }, {
-    tableName: 'review_metadata'
+    tableName: 'review_metadata',
+    indexes: [{
+      unique: true,
+      name: 'idx_review_metadata_review_id',
+      fields: ['product_id']
+    }, {
+      unique: true,
+      name: 'idx_review_metadata_rating_id',
+      fields: ['rating_id']
+    }, {
+      unique: true,
+      name: 'idx_review_metadata_recommended_id',
+      fields: ['recommended_id']
+    }]
   });
   ReviewMetadata.associate = function(models) {
     ReviewMetadata.belongsTo(models.Product, {

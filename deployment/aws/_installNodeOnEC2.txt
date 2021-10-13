@@ -1,0 +1,59 @@
+PREREQUISITES
+
+This assumes that you have already experimented with creating instances under EC2 and know
+how to use ssh keys to access an instance.  If not, try experimenting with that first and
+setup some keys.
+
+This also assume that you have a Security Group with Port 80 available.  If not, experiment
+with creating one of those as well.
+
+CREATE A NEW INSTANCE
+
+1. Login to the AWS console: https://aws.amazon.com/console/
+2. Click on the EC2 tab
+3. You should be on the EC2 Dashboard page - if not, click EC2 Dashboard under Navigation
+4. Click: Launch Instance
+5. Select: Quick Launch
+6. Select: Ubuntu Server 11.10 / 64 bit
+7. Click: Continue
+8. Click: Edit Details
+9. Expand: Security Settings
+10. Select a group you created in the prerequisites that has Port 80 available
+11. Click: Save Details
+12: Click: Launch
+13: Click: Close
+14. You should be back in the dashboard
+15. Click: Instance
+16. While waiting for your instance to boot up, the Name should default to "Empty"
+ - click on it and give it a new name, like "nodejs1"
+17. When Status Checks shows a green check mark, you should be ready to login.
+
+LOGIN TO INSTANCE
+
+1. Click on the instance so that you can see it's host name.
+2. In a terminal window change to the folder where you have the *.PEM file that you created
+to access your instances.
+3. Type the following at the command line (substituting your pem and instance hostname):
+
+    ssh -i [.your_keypair].pem ubuntu@[your-ec2-hostname].amazonaws.com
+
+INSTALL NODE
+
+Source: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
+
+At the command line type the following:
+
+    sudo apt-get update
+    sudo apt-get install nodejs npm
+    node --version
+
+INSTALL GIT
+
+    sudo apt-get install git
+    git --version
+
+TO UPGRADE NODE AT A LATER DATE
+
+If a later version of node.js is released, just install again to upgrade:
+
+    sudo apt-get install nodejs npm

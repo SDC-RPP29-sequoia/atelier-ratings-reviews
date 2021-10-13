@@ -1,0 +1,1 @@
+NODE_ENV=production node atelier-ratings-reviews/server/index.js

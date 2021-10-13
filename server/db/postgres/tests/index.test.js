@@ -207,7 +207,7 @@ describe('postgres tests', function () {
           },
           Quality: {
             id: 18,
-            value: 2,
+            value: '2',
           }
         }
       };
@@ -225,11 +225,11 @@ describe('postgres tests', function () {
         characteristics: {
           Comfort: {
             id: 17,
-            value: 5,
+            value: '5',
           },
           Quality: {
             id: 18,
-            value: 3,
+            value: '3',
           }
         }
       };
@@ -257,7 +257,7 @@ describe('postgres tests', function () {
     it('Returns an array of reviews associated with a product by product public id', done => {
         let productReviewsExpected = {
           product: 1,
-          page: 1,
+          page: 0,
           count: 5,
           results: [
             {
@@ -281,7 +281,7 @@ describe('postgres tests', function () {
               body: 'I really did not like this product solely because I am tiny and do not fit into it.',
               date: new Date(1610178433963),
               helpfulness: 2
-            }
+            },
           ]
         };
 
@@ -726,7 +726,6 @@ describe('postgres tests', function () {
   //   });
   });
 
-  // TBD: Table join for reviewer name, characteristics, photos
   describe('getReview', function () {
     it('Returns an existing review by public review ID', done => {
       let reviewExpected = {
@@ -886,7 +885,6 @@ describe('postgres tests', function () {
     });
   });
 
-  // TBD: Table join for rating_id & recommended_id
   describe('getReviewMetadata', function () {
     it('Returns metadata for the reviews of an existing product by public product ID', done => {
       let metadataExpected = {
@@ -913,7 +911,9 @@ describe('postgres tests', function () {
     it('Returns metadata for the reviews of an existing product with no ratings or recommendations', done => {
       let metadataExpected = {
         product_id: 11,
-        ratings: {},
+        ratings: {
+          // "0": 1
+        },
         recommended: {},
         characteristics: {}
       };
@@ -945,11 +945,11 @@ describe('postgres tests', function () {
           },
           Length: {
             id: 2,
-            value: 2.5,
+            value: '2.5',
           },
           Comfort: {
             id: 3,
-            value: 5,
+            value: '5',
           },
           Quality: {
             id: 4,
@@ -1010,7 +1010,7 @@ describe('postgres tests', function () {
         characteristics: {
           Length: {
             id: 16,
-            value: 3.67,
+            value: '3.67',
           }
         }
       };
@@ -1028,7 +1028,7 @@ describe('postgres tests', function () {
         characteristics: {
           Length: {
             id: 16,
-            value: 3,
+            value: '3',
           }
         }
       };
@@ -1055,107 +1055,107 @@ describe('postgres tests', function () {
       .catch(error => done(error));
     });
 
-    // it('Marks a review as reported by public review ID, which prevents it from returning in future get requests', done => {
-    //   let reviewExpected = { // Review to report 1
-    //     review_id: 12,
-    //     product_id: 9,
-    //     reviewer_name: "reviewAdder3",
-    //     rating: 5,
-    //     summary: 'Report me!!',
-    //     recommend: true,
-    //     response: null,
-    //     body: 'I really like these pants. Best fit ever!',
-    //     date: new Date(1609325851021),
-    //     helpfulness: 2
-    //   };
-    //   let reviewIdFilter = { review_id: reviewExpected.review_id };
+    it('Marks a review as reported by public review ID, which prevents it from returning in future get requests', done => {
+      let reviewExpected = { // Review to report 1
+        review_id: 12,
+        product_id: 9,
+        reviewer_name: "reviewAdder3",
+        rating: 5,
+        summary: 'Report me!!',
+        recommend: true,
+        response: null,
+        body: 'I really like these pants. Best fit ever!',
+        date: new Date(1609325851021),
+        helpfulness: 2
+      };
+      let reviewIdFilter = { review_id: reviewExpected.review_id };
 
-    //   db.getReview(reviewIdFilter)
-    //   .then(review => {
-    //     expect(review).toBeDefined();
-    //     expect(review).toEqual(expect.objectContaining(reviewExpected));
-    //   })
-    //   .then(() => db.reportReview(reviewIdFilter))
-    //   .then(() => db.getReview(reviewIdFilter))
-    //   .then(review => {
-    //     expect(review).toBeUndefined();
-    //     done();
-    //   })
-    //   .catch(error => done(error));
-    // });
+      db.getReview(reviewIdFilter)
+      .then(review => {
+        expect(review).toBeDefined();
+        expect(review).toEqual(expect.objectContaining(reviewExpected));
+      })
+      .then(() => db.reportReview(reviewIdFilter))
+      .then(() => db.getReview(reviewIdFilter))
+      .then(review => {
+        expect(review).toBeUndefined();
+        done();
+      })
+      .catch(error => done(error));
+    });
 
-    // it('Marks a review as reported by public review ID, which removes the review\'s contributions to metadata', done => {
-    //   let metadataExpectedInitial = {
-    //     product_id: 9,
-    //     ratings: {
-    //       2: 1,
-    //       4: 1
-    //     },
-    //     recommended: {
-    //       true: 1,
-    //       false: 1
-    //     },
-    //     characteristics: {
-    //       Length: {
-    //         id: 16,
-    //         value: 3,
-    //       }
-    //     }
-    //   };
+    it('Marks a review as reported by public review ID, which removes the review\'s contributions to metadata', done => {
+      let metadataExpectedInitial = {
+        product_id: 9,
+        ratings: {
+          2: 1,
+          4: 1
+        },
+        recommended: {
+          true: 1,
+          false: 1
+        },
+        characteristics: {
+          Length: {
+            id: 16,
+            value: '3',
+          }
+        }
+      };
 
-    //   // { // Review to report 2
-    //   //   review_id: 13,
-    //   //   product_id: 9,
-    //   //   profile_id: 17,
-    //   //   rating: 2,
-    //   //   summary: 'Report me, too!!',
-    //   //   recommend: false,
-    //   //   response: null,
-    //   //   body: 'I really like these pants. Best fit ever!',
-    //   //   date: new Date(1609325851021),
-    //   //   createdAt: new Date(),
-    //   //   updatedAt: new Date(),
-    //   //   helpfulness: 2,
-    //   //   reported: false,
-    //   // },
+      // { // Review to report 2
+      //   review_id: 13,
+      //   product_id: 9,
+      //   profile_id: 17,
+      //   rating: 2,
+      //   summary: 'Report me, too!!',
+      //   recommend: false,
+      //   response: null,
+      //   body: 'I really like these pants. Best fit ever!',
+      //   date: new Date(1609325851021),
+      //   createdAt: new Date(),
+      //   updatedAt: new Date(),
+      //   helpfulness: 2,
+      //   reported: false,
+      // },
 
-    //   let metadataExpectedFinal = {
-    //     product_id: 9,
-    //     ratings: {
-    //       4: 1
-    //     },
-    //     recommended: {
-    //       true: 1
-    //     },
-    //     characteristics: {
-    //       Length: {
-    //         id: 16,
-    //         value: 4,
-    //       }
-    //     }
-    //   };
+      let metadataExpectedFinal = {
+        product_id: 9,
+        ratings: {
+          4: 1
+        },
+        recommended: {
+          true: 1
+        },
+        characteristics: {
+          Length: {
+            id: 16,
+            value: '4',
+          }
+        }
+      };
 
-    //   let productIdFilter = { product_id: metadataExpectedInitial.product_id };
-    //   let reviewIdFilter = { review_id: 13 };
+      let productIdFilter = { product_id: metadataExpectedInitial.product_id };
+      let reviewIdFilter = { review_id: 13 };
 
-    //   db.getReviewMetadata(productIdFilter)
-    //   .then(metadata => {
-    //     expect(metadata).toEqual(expect.objectContaining(metadataExpectedInitial));
-    //   })
-    //   .then(() => db.getReview(reviewIdFilter))
-    //   .then(review => {
-    //     expect(review).toBeDefined();
-    //   })
-    //   .then(() => db.reportReview(reviewIdFilter))
-    //   .then(() => db.getReview(reviewIdFilter))
-    //   .then(review => expect(review).toBeUndefined())
-    //   .then(() => db.getReviewMetadata(productIdFilter))
-    //   .then(metadata => {
-    //     expect(metadata).toEqual(expect.objectContaining(metadataExpectedFinal));
-    //     done();
-    //   })
-    //   .catch(error => done(error));
-    // });
+      db.getReviewMetadata(productIdFilter)
+      .then(metadata => {
+        expect(metadata).toEqual(expect.objectContaining(metadataExpectedInitial));
+      })
+      .then(() => db.getReview(reviewIdFilter))
+      .then(review => {
+        expect(review).toBeDefined();
+      })
+      .then(() => db.reportReview(reviewIdFilter))
+      .then(() => db.getReview(reviewIdFilter))
+      .then(review => expect(review).toBeUndefined())
+      .then(() => db.getReviewMetadata(productIdFilter))
+      .then(metadata => {
+        expect(metadata).toEqual(expect.objectContaining(metadataExpectedFinal));
+        done();
+      })
+      .catch(error => done(error));
+    });
 
     // TBD: Finish. Requires updating data and therefore initial expected data
     // it('Marks a review as reported by public review ID, which prevents it from returning in future product review get requests', done => {

@@ -1,0 +1,1 @@
+ssh -i "atelier-sequoia-server.cer" ubuntu@ec2-3-137-183-102.us-east-2.compute.amazonaws.com

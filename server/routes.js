@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const fs = require('fs');
+const path = require('path');
 
 // ==== start ========= from ./model/adaptor.js
 const ReviewInput = require('./contractObjects/input/ReviewInput.js');
@@ -27,6 +29,15 @@ dbSecondaryInit(() => console.log('Database loaded!'))
 
   // Authentication
   // To use this API, you must create a GitHub API Token and attach it in every request as an "Authorization" header.
+
+  router.get('/', (req, res) => {
+    res.send('Howdy!');
+  });
+
+  router.get('/loaderio-820164498ed16bb94bfe6e8106a24b63/', (req, res) => {
+    console.log('Getting loader.io key');
+    res.sendFile('/home/ubuntu/atelier-ratings-reviews/server/loaderio-820164498ed16bb94bfe6e8106a24b63.txt');
+  });
 
   // https://learn-2.galvanize.com/cohorts/2592/blocks/94/content_files/Front%20End%20Capstone/project-atelier/reviews.md
 

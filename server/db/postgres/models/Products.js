@@ -2,7 +2,12 @@ module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define('Product', {
     product_id: DataTypes.INTEGER, // allowNull: false
   }, {
-    tableName: 'product'
+    tableName: 'product',
+    indexes: [{
+      unique: true,
+      name: 'idx_product_product_id',
+      fields: ['product_id']
+    }]
   });
   Product.associate = function(models) {
     Product.hasMany(models.Review, {
