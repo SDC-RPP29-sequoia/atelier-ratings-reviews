@@ -60,6 +60,36 @@ module.exports = {
         type: Sequelize.DATE
       }
     // }, {
+    //   indexes: [{
+    //     unique: true,
+    //     name: 'idx_review_review_id',
+    //     fields: ['review_id']
+    //   }, {
+    //     unique: false,
+    //     name: 'idx_review_product_id',
+    //     fields: ['product_id']
+    //   }, {
+    //     unique: false,
+    //     name: 'idx_review_profile_id',
+    //     fields: ['profile_id']
+    // }]
+      // }
+      }, {
+        uniqueKeys: {
+          idx_review_review_id: {
+            fields: ['review_id'],
+            customIndex: true
+          },
+          // idx_review_product_id: {
+          //   fields: ['product_id'],
+          //   customIndex: true
+          // },
+          // idx_review_profile_id: {
+          //   fields: ['profile_id'],
+          //   customIndex: true
+          // }
+        }
+    // }, {
     //   uniqueKeys: {
     //     unique_tag: {
     //         customIndex: true,

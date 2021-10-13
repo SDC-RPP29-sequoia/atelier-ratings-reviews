@@ -61,7 +61,7 @@ const reviewToOutput = (review) => {
       reviewOutput.addCharacteristic(
         characteristic.characteristic_id,
         characteristic.name,
-        characteristic.rating
+        characteristic.ReviewToCharacteristic.rating
       );
     });
   } else {

@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   ReviewToPhoto.associate = function(models) {
     ReviewToPhoto.belongsTo(models.Photo, {
       foreignKey: 'photo_id',
-      as: 'characteristics'
+      as: 'photos'
     });
     ReviewToPhoto.belongsTo(models.Review, {
       foreignKey: 'review_id',

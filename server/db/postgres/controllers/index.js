@@ -1,5 +1,5 @@
 const adaptor = require('./adaptor.js');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 module.exports = (db) => {
   const {
@@ -11,7 +11,8 @@ module.exports = (db) => {
     Profile,
     Photo,
     ReviewToPhoto,
-    ReviewToCharacteristic } = db;
+    ReviewToCharacteristic,
+    Product } = db;
 
   // ===== Create Methods =====
   const addReview = (reviewServer) => {
@@ -278,54 +279,56 @@ module.exports = (db) => {
     });
   };
 
-  // TBD: Table join for reviewer name, characteristics (joined to rating), photos
-  const getReview = (reviewIdFilter, getCharacteristics = true) => {
+  const getReview = (reviewIdFilter) => {
     return new Promise( (resolve, reject) => {
-      console.log('getReview promise');
-      let review;
-      Review.findOne({ where: reviewIdFilter })
-      .then(row => {
-        if (row === null) {
-          console.log('Review not found!', reviewIdFilter);
-          resolve();
-        } else {
-          console.log('Row: ', row);
-          review = row.get();
-          if (review.reported) {
-            console.log('Review has been reported and will not be returned');
-            resolve();
-          } else {
-            // TBD: Naive solution. Later implement table joins.
-            const characteristicsCB = getCharacteristics
-            ? getReviewCharacteristics
-            : () => new Promise(resolve => resolve());
+      // console.log('getReview promise');
 
-            Promise.all([
-              getProfile(review.profile_id),
-              getReviewPhotos(review.id),
-              characteristicsCB(review.id)
-            ])
-            .then(results => {
-              let profile = results[0];
-              review.username = profile.username;
+      reviewIdFilter.reported = {
+        [Op.not]: true
+      }
 
-              let photos = results[1];
-              if (photos) {
-                review.photos = photos;
-              }
-
-              let characteristics = results[2];
-              if (characteristics) {
-                review.characteristics = characteristics;
-              }
-            })
-            .then(() => {
-              console.log('review: ', review);
-              resolve(adaptor.reviewToOutput(review));
-            })
+      Review.findOne({
+        where: reviewIdFilter,
+        include: [{
+            model: Profile,
+            as: 'user',
+            attributes: ['username']
+          }, {
+            model: Product,
+            as: 'product',
+            attributes: ['product_id']
+          }, {
+            model: Photo,
+            as: 'Photos',
+            required: false,
+            attributes: ['photo_id', 'url']
+          }, {
+            model: Characteristic,
+            as: 'Characteristics',
+            required: false,
           }
-        }
+        ]
       })
+      .then(reviewItem => {
+        let review = (reviewItem === null)
+          ? undefined
+          : adaptor.reviewToOutput({
+              review_id: reviewItem.review_id,
+              product_id: reviewItem.product.product_id,
+              username: reviewItem.user.username,
+              rating: reviewItem.rating,
+              summary: reviewItem.summary,
+              recommend: reviewItem.recommend,
+              body: reviewItem.body,
+              response: reviewItem.response,
+              date: reviewItem.date,
+              helpfulness: reviewItem.helpfulness,
+              photos: reviewItem.Photos,
+              characteristics: reviewItem.Characteristics,
+          });
+          resolve(review);
+        }
+      )
       .catch(error => {
         console.log('getReview error:', error);
         reject(error);
@@ -478,9 +481,32 @@ module.exports = (db) => {
     return getFromOne(photoIdFilter, Photo, 'getPhoto');
   }
 
-  // TBD: Use rating join
+  //#### TBD: Use rating join
   const getCharacteristic = (characteristicIdFilter) => {
     return new Promise((resolve, reject) => {
+      // Characteristic.findOne({
+      //   where: characteristicIdFilter,
+      //   include: {
+      //     model: Rating,
+      //     as: 'rating',
+      //     required: false
+      //   }
+      // })
+      // .then(row => {
+      //   if (row === null) {
+      //     console.log(`${Characteristic.name} not found!`, characteristicIdFilter);
+      //     resolve();
+      //   } else {
+      //     let item = row.get();
+      //     // console.log('Inner Join Char-rating: ', item);
+      //     resolve(item);
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(`getCharacteristic error:`, error);
+      //   reject(error);
+      // });
+
       getFromOne(characteristicIdFilter, Characteristic, 'getCharacteristic')
       .then(characteristic => {
         if (characteristic) {
@@ -500,9 +526,31 @@ module.exports = (db) => {
     });
   }
 
-  // TBD: Use rating join
+  //### TBD: Use rating join
   const getCharacteristics = (characteristicIdFilter) => {
     return new Promise((resolve, reject) => {
+      // Characteristic.findAll({
+      //   where: characteristicIdFilter,
+      //   include: {
+      //     model: Rating,
+      //     as: 'rating',
+      //     required: false
+      //   }
+      //  })
+      // .then(rows => {
+      //   if (rows === null || rows.length === 0) {
+      //     console.log(`${getCharacteristics.name} not found!`, characteristicIdFilter);
+      //     resolve();
+      //   } else {
+      //     console.log('Inner Join Chars-rating: ', rows);
+      //     resolve(rows);
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(`getCharacteristics error:`, error);
+      //   reject(error);
+      // });
+
       let getCharacteristicRatings = [];
       getFromMany(characteristicIdFilter, Characteristic, 'getCharacteristics')
       .then(rows => {
