@@ -56,14 +56,13 @@ dbSecondaryInit(() => console.log('Database loaded!'))
 
       if (productId) {
         const productReviewRequest = adaptor.productReviewsRequestFromServerToDatabase(productId, page, count, sortBy);
-        console.log('productReviewRequest: ', productReviewRequest);
+        // console.log('productReviewRequest: ', productReviewRequest);
         let filter = undefined; // TODO sort this out, including location of definition
 
         db.getProductReviews(productReviewRequest, filter)
         .then(result => {
           if (result) {
             result.product = productId;
-            // console.log('Result: ', result);
             res.status('200').send(result);
           } else {
             let message = `No results were found associated with product_id ${productId}`;
@@ -84,7 +83,7 @@ dbSecondaryInit(() => console.log('Database loaded!'))
   // Returns review metadata for a given product.
   router.get('/reviews/meta',
     (req, res) => {
-      console.log('req.query: ', req.query);
+      // console.log('req.query: ', req.query);
       const productId = req.query.product_id;
 
       if (productId) {
@@ -92,7 +91,7 @@ dbSecondaryInit(() => console.log('Database loaded!'))
         db.getReviewMetadata(productIdFilter)
         .then(result => {
           if (result) {
-            console.log('Result: ', result);
+            // console.log('Result: ', result);
             res.status('200').send(result)
           } else {
             let message = `No results were found associated with product_id ${productId}`;
@@ -113,14 +112,13 @@ dbSecondaryInit(() => console.log('Database loaded!'))
   router.get('/review/',
     (req, res) => {
       const reviewId = req.query.review_id;
-      console.log('req.query: ', req.query);
+      // console.log('req.query: ', req.query);
       if (reviewId) {
         let reviewIdFilter = { review_id: reviewId};
 
         db.getReview(reviewIdFilter)
         .then(result => {
           if (result) {
-            console.log('Result: ', result);
             res.status('200').send(result);
           } else {
             let message = `No results were found associated with review_id ${reviewId}`;
@@ -143,8 +141,8 @@ dbSecondaryInit(() => console.log('Database loaded!'))
     (req, res) => {
 
       let reviewClient = req.body;
-      console.log('req: ', req);
-      console.log('req.body: ', req.body);
+      // console.log('req: ', req);
+      // console.log('req.body: ', req.body);
 
       const validator = {
         message: '',
@@ -171,7 +169,7 @@ dbSecondaryInit(() => console.log('Database loaded!'))
         const review = adaptor.reviewFromServerToDatabase(reviewClient);
         db.addReview(review)
         .then((result) => {
-          console.log('Result: ', result);
+          // console.log('Result: ', result);
           res.status('201').send(result)
         })
         .catch(error => {

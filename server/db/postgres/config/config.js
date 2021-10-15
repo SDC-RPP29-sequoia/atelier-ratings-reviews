@@ -42,6 +42,12 @@ module.exports = {
     password: process.env.PASSWORD_POSTGRES,
     dialect: 'postgres',
     logging: false,
+    pool: {
+      max: 400,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
     // define: { timestamps: false }
   },
 };
