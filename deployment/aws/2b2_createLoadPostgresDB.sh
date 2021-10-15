@@ -16,6 +16,7 @@ CREATE DATABASE targetdb;
 # Code language: PostgreSQL SQL dialect and PL/pgSQL (pgsql)
 # Finally, restore the dump file on the remote server: (ca. 7 min local, min on AWS)
 sudo -u postgres psql -d ratings_reviews -f ratings_reviews.sql
+sudo psql -u markthomas -h 3.137.183.102 -d ratings_reviews -f ratings_reviews.sql # for when authorization is required
 
 # === Active Connections ===
 sudo -u postgres psql

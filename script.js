@@ -24,21 +24,21 @@ export let options = {
     //   preAllocatedVUs: 50,
     //   maxVUs: 500, // typ. 5x rate
     // },
-    constant_100: {
-      executor: 'constant-arrival-rate',
-      // gracefulStop: '30s', // Time to wait for iterations to finish executing before stopping them forcefully. 30 sec default
-      rate: 100, // Number of iterations to execute each timeUnit period (default 1s). System cannot handle 1,000 rps
-      duration: '1m', // 10s
-      preAllocatedVUs: 500,
-      maxVUs: 5000, // typ. 5x rate
-    },
+    // constant_100: {
+    //   executor: 'constant-arrival-rate',
+    //   // gracefulStop: '30s', // Time to wait for iterations to finish executing before stopping them forcefully. 30 sec default
+    //   rate: 100, // Number of iterations to execute each timeUnit period (default 1s). System cannot handle 1,000 rps
+    //   duration: '1m', // 10s
+    //   preAllocatedVUs: 500,
+    //   maxVUs: 5000, // typ. 5x rate
+    // },
     // constant_1000: {
     //   executor: 'constant-arrival-rate',
     //   // gracefulStop: '30s', // Time to wait for iterations to finish executing before stopping them forcefully. 30 sec default
     //   rate: 1000, // Number of iterations to execute each timeUnit period (default 1s). System cannot handle 1,000 rps
     //   duration: '1m', // 10s
     //   preAllocatedVUs: 1000,
-    //   maxVUs: 5000, // typ. 5x rate
+    //   maxVUs: 50000, // typ. 5x rate
     // },
     // ramp_10: {
     //   executor: 'ramping-arrival-rate',
@@ -68,23 +68,23 @@ export let options = {
     //     { duration: '1m', target: 0 },
     //   ],
     // },
-    // ramp_1000: {
-    //   executor: 'ramping-arrival-rate',
-    //   // gracefulStop: '30s',
-    //   startRate: 1,
-    //   preAllocatedVUs: 20,
-    //   maxVUs: 5000, // typ 5x max target
-    //   stages: [
-    //     { duration: '1m', target: 1 },
-    //     { duration: '1m', target: 10 },
-    //     { duration: '1m', target: 10 },
-    //     { duration: '1m', target: 100 },
-    //     { duration: '1m', target: 100 }, // 500 maxVUs needed
-    //     { duration: '1m', target: 1000 },
-    //     { duration: '1m', target: 1000 }, // 5,000 maxVUs needed, but errors begin around 2,000 (12)
-    //     { duration: '1m', target: 0 },
-    //   ],
-    // },
+    ramp_1000: {
+      executor: 'ramping-arrival-rate',
+      // gracefulStop: '30s',
+      startRate: 1,
+      preAllocatedVUs: 20,
+      maxVUs: 10000, // typ 5x max target
+      stages: [
+        { duration: '1m', target: 1 },
+        { duration: '1m', target: 10 },
+        { duration: '1m', target: 10 },
+        { duration: '1m', target: 100 },
+        { duration: '1m', target: 100 }, // 500 maxVUs needed
+        { duration: '1m', target: 1000 },
+        { duration: '1m', target: 1000 }, // 5,000 maxVUs needed, but errors begin around 2,000 (12)
+        { duration: '1m', target: 0 },
+      ],
+    },
   },
   thresholds: {
     'errorRare': [
@@ -95,7 +95,7 @@ export let options = {
 };
 
 export default function () {
-  const testEnv = 'test'; //process.env.NODE_ENV || 'test'; 'scaled'
+  const testEnv = 'scaled'; //process.env.NODE_ENV || 'test'; 'scaled'
   getReview(testEnv);
   // getProductReviews(testEnv);
   // getReviewMetadata(testEnv);
@@ -114,7 +114,7 @@ const getReview = (testEnv) => {
   let reviewIds = testEnv === 'test'
     ? [ 2, 3, 5 ] // Test DB
     : [ 5, 2107492, 5765000 ]; // Scaled DB
-  const res = http.get(`${url}:${port}/review?review_id=${reviewIds[1]}`, {
+  const res = http.get(`${url}:${port}/review?review_id=${reviewIds[2]}`, {
     tags: { name: 'getReviewURL' },
   });
   const latency = Date.now() - start;
