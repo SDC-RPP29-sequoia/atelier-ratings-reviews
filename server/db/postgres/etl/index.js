@@ -59,17 +59,17 @@ const run = () => {
 
     // .then(() => extractor.parseCsvFileToJson(
     //  // 5,774,952 entries - 2.87 GB - 5,765,293 entries added, short 10k
-    //   reviews.filename,
-    //   reviews.transformAndLoad,
-    //   isDryRun)//)
-    // .then(() => console.log(`Completed ETL of ${reviews.filename}`))
+      reviews.filename,
+      reviews.transformAndLoad,
+      isDryRun)//)
+    .then(() => console.log(`Completed ETL of ${reviews.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
     // // 19,327,575 entries - 1.58 GB - 4,980,298 entries added (in progress & re-run first 2 mil)
-      reviewsToCharacteristics.filename,
-      reviewsToCharacteristics.transformAndLoad,
-      isDryRun)//)
-    .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.filename}`))
+    //   reviewsToCharacteristics.filename,
+    //   reviewsToCharacteristics.transformAndLoad,
+    //   isDryRun)//)
+    // .then(() => console.log(`Completed ETL of ${reviewsToCharacteristics.filename}`))
 
     // .then(() => extractor.parseCsvFileToJson(
     // // 2,742,540 entries - 476 MB - 1,396,917 entries added (in progress & re-run first 2 mil, then last mil)

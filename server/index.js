@@ -1,5 +1,5 @@
 const app = require('./app.js');
-const port = 3000;
+const config = require('./config/config');
 
 // const mongo = require('./db/mongo')(); // Can add env/config variable here
 
@@ -10,8 +10,9 @@ const port = 3000;
 //     console.log(`NSA is listening in at http://localhost:${port}`);
 //   })
 // });
-app.listen(port, () => {
-  console.log(`NSA is listening in at http://localhost:${port}`);
+
+app.listen(config.port, () => {
+  console.log(`NSA is listening in on ${config.name} at ${config.baseUrl}:${config.port}`);
 })
 
 // TODO:

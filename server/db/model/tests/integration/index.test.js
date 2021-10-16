@@ -1,4 +1,4 @@
-import dbModel from '../index.js';
+import dbModel from '../../index.js';
 
 // const dbInit = dbModel('test');
 let postgresDB;

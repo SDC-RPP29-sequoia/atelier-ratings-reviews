@@ -18,6 +18,11 @@ CREATE DATABASE targetdb;
 sudo -u postgres psql -d ratings_reviews -f ratings_reviews.sql
 sudo psql -u markthomas -h 3.137.183.102 -d ratings_reviews -f ratings_reviews.sql # for when authorization is required
 
+# on local MacOS
+pg_dump -u markthomas -d ratings_reviews_dev -f ratings_reviews.sql
+sudo -u markthomas psql -d ratings_reviews -f ratings_reviews.sql
+sudo -u markthomas psql -d ratings_reviews_dev -f ratings_reviews.sql
+
 # === Active Connections ===
 sudo -u postgres psql
 # The following query returns the active connections:
