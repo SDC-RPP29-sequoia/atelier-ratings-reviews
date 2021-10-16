@@ -1,29 +1,30 @@
-const dotenv = require('dotenv');
-dotenv.config({ path: `${__dirname}/.env`  });
+require('dotenv').config({ path: `${__dirname}/.env` });
+
+const { env } = process;
 
 module.exports = {
   development: {
-    url: process.env.DEV_DATABASE_URL_MONGO,
-    database: process.env.DEV_DATABASE_MONGO,
-    host: process.env.HOST,
-    port: process.env.PORT_MONGO,
-    username: process.env.USERNAME_MONGO,
-    password: process.env.PASSWORD_MONGO,
+    url: env.DEV_DATABASE_URL_MONGO,
+    database: env.DEV_DATABASE_MONGO,
+    host: env.HOST_MONGO,
+    port: env.PORT_MONGO,
+    username: env.USERNAME_MONGO,
+    password: env.PASSWORD_MONGO,
   },
   test: {
-    url: process.env.TEST_DATABASE_URL_MONGO,
-    database: process.env.TEST_DATABASE_MONGO,
-    host: process.env.HOST,
-    port: process.env.PORT_MONGO,
-    username: process.env.USERNAME_MONGO,
-    password: process.env.PASSWORD_MONGO,
+    url: env.TEST_DATABASE_URL_MONGO,
+    database: env.TEST_DATABASE_MONGO,
+    host: env.HOST_MONGO,
+    port: env.PORT_MONGO,
+    username: env.USERNAME_MONGO,
+    password: env.PASSWORD_MONGO,
   },
   production: {
-    url: process.env.DATABASE_URL_MONGO,
-    database: process.env.DATABASE_MONGO,
-    host: process.env.HOST,
-    port: process.env.PORT_MONGO,
-    username: process.env.USERNAME_MONGO,
-    password: process.env.PASSWORD_MONGO,
+    url: env.DATABASE_URL_MONGO,
+    database: env.DATABASE_MONGO,
+    host: env.HOST_MONGO,
+    port: env.PORT_MONGO,
+    username: env.USERNAME_MONGO,
+    password: env.PASSWORD_MONGO,
   },
 };

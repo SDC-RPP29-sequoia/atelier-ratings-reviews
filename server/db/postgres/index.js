@@ -58,60 +58,16 @@ module.exports = (envOrConfigIn) => {
     });
   };
 
-  const resetDatabase = (callback) => {
-    return new Promise((resolve, reject) => {
-      resolve(true);
-      // if (envOrConfig === 'test') {
-      //   console.log('Resetting Postgres database');
-      //   seedDatabase()
-      //   .then (() => {
-      //     console.log('Postgres database reset & re-seeded');
-      //     callback && callback();
-      //     resolve(true);
-      //   })
-      //   .catch (error => {
-      //     console.log('Unable to reset Postgres database', error);
-      //     reject(error);
-      //   });
-      // } else {
-      //   resolve(false);
-      // }
-    })
-  }
-
   const initializeDatabase = (callback) => {
     return new Promise((resolve, reject) => {
-      let isDatabaseReset = false;
       console.log('Initializing Postgres database');
-      resetDatabase()
-      .catch(error => {
-        console.log('Error resetting postgres database', error);
-        reject(error);
+      connectDatabase()
+      .then(sequelize => {
+        return sequelize.authenticate();
       })
-      .then(dbReset => {
-        isDatabaseReset = dbReset;
-        connectDatabase();
-      })
-      .then(() => {
-        sequelize.authenticate();
-      })
-      .then(() => {
-        if (isDatabaseReset) {
-          callback && callback();
-          resolve();
-        } else {
-          console.log('Syncing Postgres database')
-          sequelize.sync() // This creates the table for any model if it doesn't exist (and does nothing if it already exists)
-          .then (() => {
-            console.log('Sync completed');
-            callback && callback();
-            resolve();
-          })
-          .catch(error => {
-            console.log('Error syncing Postgres database!', error);
-            reject(error);
-          });
-        }
+      .then(result => {
+        callback && callback();
+        resolve();
       })
       .catch(error => {
         console.error('Unable to initialize the Postgres database:', error);
@@ -143,7 +99,6 @@ module.exports = (envOrConfigIn) => {
           Sequelize: Sequelize,
           sequelize: sequelize,
           initializeDatabase: initializeDatabase,
-          resetDatabase: resetDatabase,
           closeDatabase: closeDatabase,
           model: model,
           methods: controller(model)

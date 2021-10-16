@@ -1,11 +1,11 @@
 // import app from '../server/index.js';
 // import dbModel from '../index.js';
 // const app = require('../server/index.js');
-const app = require('../server/app.js');
+const app = require('../../server/app.js');
 const request = require('supertest');
-const { seedDatabase } = require('../server/db/postgres/seed.js');
+const { seedDatabase } = require('../../server/db/postgres/seed.js');
 
-const postgres = require('../server/db/postgres')(); // Can add env/config variable here
+const postgres = require('../../server/db/postgres')(); // Can add env/config variable here
 const port = 3000;
 
 // const dbInit = dbModel('test');

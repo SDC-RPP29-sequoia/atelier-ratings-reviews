@@ -293,7 +293,7 @@ module.exports = (db) => {
 
   const getReview = (reviewIdFilter) => {
     return new Promise( (resolve, reject) => {
-
+      console.log('Getting review: ', reviewIdFilter);
       reviewIdFilter.reported = {
         [Op.not]: true
       }

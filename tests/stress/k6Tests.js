@@ -114,7 +114,7 @@ const getReview = (testEnv) => {
   let reviewIds = testEnv === 'test'
     ? [ 2, 3, 5 ] // Test DB
     : [ 5, 2107492, 5765000 ]; // Scaled DB
-  const res = http.get(`${url}:${port}/review?review_id=${reviewIds[2]}`, {
+  const res = http.get(`${url}:${port}/reviews/review?review_id=${reviewIds[2]}`, {
     tags: { name: 'getReviewURL' },
   });
   const latency = Date.now() - start;

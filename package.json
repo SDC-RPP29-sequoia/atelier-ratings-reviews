@@ -7,7 +7,7 @@
     "test": "export NODE_ENV='test' & jest --coverage --testResultsProcessor=jest-sonar-reporter",
     "test-controller": "export NODE_ENV='test' & jest --coverage --testPathPattern=server/db/model --testResultsProcessor=jest-sonar-reporter",
     "test-routes": "export NODE_ENV='test' & jest --coverage --runTestsByPath tests/index.test.js  --testResultsProcessor=jest-sonar-reporter",
-    "test-k6": "export NODE_ENV='test' & k6 run script.js",
+    "test-k6": "export NODE_ENV='test' & k6 run ./tests/stress/k6Tests.js",
     "test-init": "jest --init",
     "test-controller-custom": "node server/db/model/tests/index.customTest.js",
     "coveralls": "export NODE_ENV='test' & jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
@@ -16,13 +16,14 @@
     "start-seed": "export NODE_ENV='test' & node server/db/postgres/seed.js -r",
     "start-dev": "export NODE_ENV='development' & nodemon --ignore node_modules server",
     "start-prod": "export NODE_ENV='production' & nodemon --ignore node_modules server",
+    "start-redis": "brew services start redis",
     "mongo-start": "brew services start mongodb-community@4.4",
     "mongo-deploy": "sh ./deployment/mongoDB.sh",
     "mongo-seed": "node index.js",
     "mongo-stop": "brew services stop mongodb-community@4.4",
     "postgres-start": "brew services start postgresql",
     "postgres-deploy": "sh ./deployment/postgresDB.sh",
-    "postgres-seed": "export NODE_ENV='test' & sh ./deployment/postgresSeed.sh",
+    "postgres-seed": "export NODE_ENV='test' & node ./server/db/postgres/seed.js -r",
     "postgres-test": "export NODE_ENV='test' & jest --coverage --testPathPattern=server/db/postgres --testResultsProcessor=jest-sonar-reporter",
     "postgres-stop": "brew services stop postgresql",
     "build": "npx babel . --out-dir ./compiled --source-maps inline --ignore=node_modules,compiled --watch",
@@ -60,14 +61,16 @@
     "supertest": "^6.1.6"
   },
   "dependencies": {
-    "bluebird": "^3.3.4",
     "cors": "^2.8.5",
     "csvtojson": "^2.0.10",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "global": "^4.4.0",
     "mongoose": "^5.13.0",
     "pg": "^8.7.1",
-    "sequelize": "^6.6.5"
+    "redis": "^3.1.2",
+    "sequelize": "^6.6.5",
+    "util": "^0.12.4"
   },
   "jest": {
     "^config$": "<rootDir>/configs/app-config.js"
