@@ -15,8 +15,8 @@ const getFilePath = (filename, dryRun) => {
   return path.resolve(initialPath, filename);
 }
 
-const lineNumberMultiple = 0; // For _to_characteristics: 8; 15, for _to_photos: 0
-const lineNumberMuplipleSpread = 1; // for _to_photos: 3
+const lineNumberMultiple = 12; // For _to_characteristics: (12)
+const lineNumberMultipleSpread = 4;
 module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxChunkSize = 10000, maxCollectionRun = 100) => {
   return new Promise((resolve, reject) => {
     const filePath = getFilePath(filename, dryRun);
@@ -38,7 +38,7 @@ module.exports.parseCsvFileToJson = (filename, callbackDB, dryRun = false, maxCh
         write: (json, encoding, callback) => {
           // console.log('Piping JSON', json);
           lineNumber++;
-          if ((lineNumberMultiple * 1000000) < lineNumber && lineNumber <= (lineNumberMultiple + lineNumberMuplipleSpread) * 1000000) { // Current cap since memory issues
+          if ((lineNumberMultiple * 1000000) < lineNumber && lineNumber <= (lineNumberMultiple + lineNumberMultipleSpread) * 1000000) { // Current cap since memory issues
             queue.push(json);
             if (queue.length >= currentChunkSize) {
               console.log(`Writing JSON batch to database up to line ${lineNumber}`);
