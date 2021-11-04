@@ -122,4 +122,5 @@ ALTER DEFAULT PRIVILEGES
 # https://stackoverflow.com/questions/29712228/node-postgres-get-error-connect-econnrefused
 # To ensure that the connection is working under the credentials assumed, try logging in with them locally first
 # sudo psql -d DB_NAME -h YOUR_IP -U USER
-sudo psql -d ratings_reviews -h 3.137.183.102 -U markthomas
+# sudo psql -d ratings_reviews -h 73.229.57.230 -U markthomas
+sudo psql -d ratings_reviews -h 3.144.7.70 -U markthomas

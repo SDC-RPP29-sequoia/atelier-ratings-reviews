@@ -6,3 +6,4 @@ df -h    - Lists file system space usage in a readable way
 ls
 
 sudo cp source destination
+
